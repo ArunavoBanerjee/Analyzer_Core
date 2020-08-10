@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -19,8 +20,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.opencsv.CSVReader;
-
-
 
 public class LoadData {
 	MatchPropValidator mpv = new MatchPropValidator(); 
@@ -65,7 +64,7 @@ public class LoadData {
 		cr.close();
 	}
 
-	void loadDataXLS(HashMap<String, HashSet<String[]>> triplet, HashMap<String[], HashSet<String>> triplet_equals, String splitDataPath) throws Exception {
+	void loadDataXLSX(HashMap<String, HashSet<String[]>> triplet, HashMap<String[], HashSet<String>> triplet_equals, String splitDataPath) throws Exception {
 		FileInputStream in_ft = new FileInputStream(splitDataPath);
 		Workbook workbook = new XSSFWorkbook(in_ft);
 		Sheet datasheet = workbook.getSheetAt(0);

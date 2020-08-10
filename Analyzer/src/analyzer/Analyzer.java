@@ -7,7 +7,12 @@ import java.io.PrintStream;
 import java.util.Properties;
 import java.util.Scanner;
 
-public class SplitData {
+/**
+ * Analyzer Wrapper. Wraps calls to all other underlying classes and methods. 
+ * @author user
+ *
+ */
+public class Analyzer {
 	static Scanner in = new Scanner(System.in);
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub

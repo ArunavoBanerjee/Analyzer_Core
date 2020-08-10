@@ -92,7 +92,7 @@ public class Validator {
 		if (splitlistPath.endsWith(".csv"))
 			newLoad.loadDataCSV(splitListMatcher, splitListMatcherEquals, splitlistPath);
 		else if (splitlistPath.endsWith(".xlsx"))
-			newLoad.loadDataXLS(splitListMatcher, splitListMatcherEquals, splitlistPath);
+			newLoad.loadDataXLSX(splitListMatcher, splitListMatcherEquals, splitlistPath);
 	}
 
 //	void showSplitList() {
