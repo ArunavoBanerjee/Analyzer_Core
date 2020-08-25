@@ -41,14 +41,20 @@ import analyzer.Engine.BooleanParser;
 import analyzer.Validators.Validator;
 
 public class Splitter {
-	static String reportDest = "", dest_matched = "", dest_unmatched = "", report_matched = "", report_unmatched = "", dataReadPath = "", csvconfigPath = "";
+	static String reportDest = "", dest_matched = "", dest_unmatched = "", report_matched = "", report_unmatched = "", dataReadPath = "", csvconfigPath = "",
+			matched_tarName = "", unmatched_tarName = "";
+	ArrayList<String> matchedNameList = new ArrayList<String>();
+	ArrayList<String> unmatchedNameList = new ArrayList<String>();
 	static String[] sourceList = null;
 	static boolean isReport = false, dataOnly = false;
 	boolean writetomatch = true;
 	HashMap<String, HashSet<String>> sourceDict = new HashMap<String, HashSet<String>>();
 	WriteToCSV reportWriter = null;
 	Validator new_validator = null;
+	static int batchSize = 0;
 	int match_count = 0, unmatch_count = 0, count_item = 0;
+	TarArchiveOutputStream tos_match = null;
+	TarArchiveOutputStream tos_unmatch = null;
 
 	public Splitter(Validator in) throws Exception {
 		this.new_validator = in;
@@ -58,23 +64,9 @@ public class Splitter {
 		dataReadPath = dataReadPath.replaceAll("^\\/", "");
 		String trimPath = dataReadPath.replaceAll("(\\/$)", "");
 		trimPath = trimPath.substring(0, trimPath.lastIndexOf('/') == -1 ? 0 : trimPath.lastIndexOf('/'));
-		TarArchiveOutputStream tos_match = null;
-		TarArchiveOutputStream tos_unmatch = null;
-		if (!isReport) {
-			if (!dest_matched.isEmpty()) {
-				FileOutputStream fos_match = new FileOutputStream(dest_matched);
-				GZIPOutputStream gos_match = new GZIPOutputStream(new BufferedOutputStream(fos_match));
-				tos_match = new TarArchiveOutputStream(gos_match);
-				tos_match.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-			}
-			if (!dest_unmatched.isEmpty()) {
-				FileOutputStream fos_unmatch = new FileOutputStream(dest_unmatched);
-				GZIPOutputStream gos_unmatch = new GZIPOutputStream(new BufferedOutputStream(fos_unmatch));
-				tos_unmatch = new TarArchiveOutputStream(gos_unmatch);
-				tos_unmatch.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-			}
-		}
 		reportWriter = new WriteToCSV();
+		dest_matched = dest_matched.replaceAll("\\.tar\\.gz$", "");
+		dest_unmatched = dest_unmatched.replaceAll("\\.tar\\.gz$", "");
 		for (String source : sourceList) {
 			File input_tar_gz = new File(source);
 			String tarPath = input_tar_gz.getAbsolutePath();
@@ -102,11 +94,39 @@ public class Splitter {
 								for (Map.Entry<String, byte[]> dataentry : entryMap.entrySet()) {
 									TarArchiveEntry out_tarEntry = new TarArchiveEntry(dataentry.getKey());
 									out_tarEntry.setSize(dataentry.getValue().length);
-									if (writetomatch && tos_match != null) {
-										tos_match.putArchiveEntry(out_tarEntry);
-										tos_match.write(dataentry.getValue());
-										tos_match.closeArchiveEntry();
-									} else if (tos_unmatch != null) {
+									if (writetomatch) {
+										if (!dest_matched.isEmpty()) {
+											if (batchSize != 0) {
+												String _name = dest_matched + "_batch_" + (match_count / batchSize)+".tar.gz";
+												if (!_name.equals(matched_tarName)) {
+													matched_tarName = _name;
+													matchedNameList.add(matched_tarName);
+													if (tos_match != null)
+														tos_match.close();
+													tos_match = get_tos(matched_tarName);
+												}
+											} else if (!matched_tarName.equals(dest_matched)) {
+												matched_tarName = dest_matched;
+												tos_match = get_tos(matched_tarName);
+											}
+											tos_match.putArchiveEntry(out_tarEntry);
+											tos_match.write(dataentry.getValue());
+											tos_match.closeArchiveEntry();
+										}
+									} else if (!dest_unmatched.isEmpty()) {
+										if (batchSize != 0) {
+											String _name = dest_unmatched + "batch_" + (unmatch_count / batchSize)+".tar.gz";
+											if (!_name.equals(unmatched_tarName)) {
+												unmatched_tarName = _name;
+												unmatchedNameList.add(unmatched_tarName);
+												if (tos_unmatch != null)
+													tos_unmatch.close();
+												tos_unmatch = get_tos(unmatched_tarName);
+											}
+										} else if (!unmatched_tarName.equals(dest_unmatched)) {
+											unmatched_tarName = dest_unmatched;
+											tos_unmatch = get_tos(unmatched_tarName);
+										}
 										tos_unmatch.putArchiveEntry(out_tarEntry);
 										tos_unmatch.write(dataentry.getValue());
 										tos_unmatch.closeArchiveEntry();
@@ -163,10 +183,6 @@ public class Splitter {
 					writetomatch = new_validator.validate(sourceDict);
 				if (!dataOnly)
 					reportWriter.csvloader(sourceDict, writetomatch);
-				if (writetomatch)
-					match_count++;
-				else
-					unmatch_count++;
 				if (!isReport) {
 					for (Map.Entry<String, byte[]> dataentry : entryMap.entrySet()) {
 						TarArchiveEntry out_tarEntry = new TarArchiveEntry(dataentry.getKey());
@@ -183,6 +199,10 @@ public class Splitter {
 					}
 				}
 			}
+			if (writetomatch)
+				match_count++;
+			else
+				unmatch_count++;
 			entryMap.clear();
 			sourceDict.clear();
 			count_item++;
@@ -191,12 +211,13 @@ public class Splitter {
 				float elapsed_time = (time - st_time);
 				if (elapsed_time / 60000 < 1) {
 					elapsed_time = elapsed_time / 1000;
-					System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + elapsed_time + " seconds.");
+					System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + Math.round(elapsed_time * 100) / 100 + " seconds.");
 				} else {
 					elapsed_time = elapsed_time / 1000;
 					float elapsed_min = elapsed_time / 60;
 					float elapsed_sec = elapsed_time % 60;
-					System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + elapsed_min + " mins " + elapsed_sec + " seconds.");
+					System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + Math.round(elapsed_min * 100) / 100 + " mins "
+							+ Math.round(elapsed_sec * 100) / 100 + " seconds.");
 				}
 			}
 			tis.close();
@@ -212,19 +233,7 @@ public class Splitter {
 			if (tos_unmatch != null)
 				tos_unmatch.close();
 		}
-		System.out.println("Matched #:" + match_count + "  UnMatched #:" + unmatch_count);
-		if (new_validator == null)
-			System.out.println("Report Destination: " + report_matched);
-		else {
-			if(!(dest_matched.isEmpty() || isReport))
-				System.out.println("Matched Data Destination: " + dest_matched);
-			if(!(dest_unmatched.isEmpty()||isReport))
-				System.out.println("UnMatched Data Destination: " + dest_unmatched);
-			if(!report_matched.isEmpty())
-				System.out.println("Matched Report Destination: " + report_matched);
-			if(!report_unmatched.isEmpty())
-				System.out.println("UnMatched Report Destination: " + report_unmatched);
-		}
+print_output();
 	}
 
 	void getSourceInfo(String itemContent) throws Exception {
@@ -296,6 +305,47 @@ public class Splitter {
 		gZIPInputStream.close();
 		return tarFile;
 
+	}
+
+	TarArchiveOutputStream get_tos(String _tarName) throws Exception {
+		File _tarFile = new File(_tarName);
+		if(_tarFile.exists())
+			_tarFile.delete();
+		FileOutputStream fos = new FileOutputStream(_tarName);
+		GZIPOutputStream gos = new GZIPOutputStream(new BufferedOutputStream(fos));
+		TarArchiveOutputStream tos = new TarArchiveOutputStream(gos);
+		tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+		return tos;
+	}
+	
+	void print_output() {
+		System.out.println("Matched #:" + match_count + "  UnMatched #:" + unmatch_count);
+		if (new_validator == null)
+			System.out.println("Report Destination: " + report_matched);
+		else {
+			if (!(dest_matched.isEmpty() || isReport)) {
+			if(batchSize == 0)
+				System.out.println("Matched Data Destination: " + dest_matched);
+			else {
+				System.out.println("Matched Data Destination:");
+				for(String _fileLocation : matchedNameList)
+					System.out.println(_fileLocation);
+			}
+			}
+			if (!(dest_unmatched.isEmpty() || isReport)) {
+				if(batchSize == 0)
+				System.out.println("UnMatched Data Destination: " + dest_unmatched);
+				else {
+					System.out.println("UnMatched Data Destination:");
+					for(String _fileLocation : unmatchedNameList)
+						System.out.println(_fileLocation);
+				}
+			}
+			if (!report_matched.isEmpty())
+				System.out.println("Matched Report Destination: " + report_matched);
+			if (!report_unmatched.isEmpty())
+				System.out.println("UnMatched Report Destination: " + report_unmatched);
+		}
 	}
 
 }

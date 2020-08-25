@@ -55,32 +55,36 @@ public class Analyzer {
 			throw new Exception("Split Expression is mandatory for data splitting.");
 		if (prop.getProperty("splitListFile") != null)
 			Validator.splitlistPath = prop.getProperty("splitListFile").strip();
-		
+
 		Validator new_validator = null;
 		if (!(reportType.equals("-r") && Validator.expr_str.isBlank())) {
 			new_validator = new Validator();
 		}
-		
+
 		Splitter.sourceList = prop.getProperty("sourceFile").split(",");
 		if (prop.getProperty("targetFileMatched") != null)
 			Splitter.dest_matched = prop.getProperty("targetFileMatched").strip();
 		if (prop.getProperty("targetFileUnMatched") != null)
 			Splitter.dest_unmatched = prop.getProperty("targetFileUnMatched").strip();
-		if (new File(Splitter.dest_matched).exists() && !Splitter.isReport)
-			new File(Splitter.dest_matched).delete();
-		if (new File(Splitter.dest_unmatched).exists() && !Splitter.isReport)
-			new File(Splitter.dest_unmatched).delete();
 		if (prop.getProperty("reportDestination") != null)
 			Splitter.reportDest = prop.getProperty("reportDestination").strip();
-
+		if (prop.getProperty("batchSize") != null) {
+			try {
+				Splitter.batchSize = Integer.parseInt(prop.getProperty("batchSize").strip());
+			} catch (Exception e) {
+				System.out.println("batchSize value '" + prop.getProperty("batchSize") + "' is not a number.");
+				throw e;
+			}
+		}
+		
 		// Running options validation and control settings.
 		validate_input_conditions(new_validator);
-		
+
 		if (prop.getProperty("dataReadPath") != null)
 			Splitter.dataReadPath = prop.getProperty("dataReadPath");
-		if (prop.getProperty("csvconfigPath") != null)
-			Splitter.csvconfigPath = prop.getProperty("csvconfigPath");
-		
+		if (prop.getProperty("csvConfigPath") != null)
+			Splitter.csvconfigPath = prop.getProperty("csvConfigPath");
+
 		Splitter newSplit = new Splitter(new_validator);
 		newSplit.churnData();
 
