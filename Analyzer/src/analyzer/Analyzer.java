@@ -68,15 +68,19 @@ public class Analyzer {
 			Splitter.dest_unmatched = prop.getProperty("targetFileUnMatched").strip();
 		if (prop.getProperty("reportDestination") != null)
 			Splitter.reportDest = prop.getProperty("reportDestination").strip();
+		
 		if (prop.getProperty("batchSize") != null) {
-			try {
-				Splitter.batchSize = Integer.parseInt(prop.getProperty("batchSize").strip());
-			} catch (Exception e) {
-				System.out.println("batchSize value '" + prop.getProperty("batchSize") + "' is not a number.");
-				throw e;
+			String _batchsize = prop.getProperty("batchSize").strip();
+			if (!_batchsize.isEmpty()) {
+				try {
+					Splitter.batchSize = Integer.parseInt(_batchsize);
+				} catch (Exception e) {
+					System.out.println("batchSize value '" + prop.getProperty("batchSize") + "' is not a number.");
+					throw e;
+				}
 			}
 		}
-		
+
 		// Running options validation and control settings.
 		validate_input_conditions(new_validator);
 
