@@ -18,22 +18,35 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import com.opencsv.CSVReader;
+import analyzer.CustomException.DataFormatException;
+import analyzer.CustomException.DataStructureException;
+import analyzer.Engine.Data;
+import analyzer.Validators.DataValidator;
+import analyzer.Validators.MatchPropValidator;
+import analyzer.Validators.Validator;
 
 public class LoadData {
-	MatchPropValidator mpv = new MatchPropValidator(); 
-	
-	void loadDataCSV(HashMap<String, HashSet<String[]>> triplet, HashMap<String[], HashSet<String>> triplet_equals, String splitDataPath) throws Exception {
+	MatchPropValidator mpv = new MatchPropValidator();
+	DataValidator dv = new DataValidator();
+	String splitDataPath;
+	String[] dataProp = new String[5];
+	String split_field, header_field;
+
+	public LoadData(String in_path) {
+		// TODO Auto-generated constructor stub
+		this.splitDataPath = in_path;
+	}
+
+	public void loadDataCSV() throws Exception {
 		CSVReader cr = new CSVReader(new FileReader(splitDataPath));
 		List<String[]> allRows = cr.readAll();
 		List<String> header = Arrays.asList(allRows.iterator().next());
 		List<String> splitID = new ArrayList<String>();
 		HashMap<String, Integer> distinctID = new HashMap<String, Integer>();
 		for (int i = 0; i < header.size(); i++) {
-			if (i != 0 && header.get(i).equalsIgnoreCase("matchType")
-					&& header.get(i - 1).equalsIgnoreCase("matchType"))
-				throw new Exception("datafile cannot have consequtive field descriptor matchType.");
+			if (i != 0 && header.get(i).equalsIgnoreCase("matchType") && header.get(i - 1).equalsIgnoreCase("matchType"))
+				throw new Exception("Datafile cannot have consequtive field descriptor matchType.");
 			if (header.get(i).equalsIgnoreCase("matchType"))
 				continue;
 			if (!distinctID.containsKey(header.get(i))) {
@@ -52,19 +65,18 @@ public class LoadData {
 		}
 		for (String keys : distinctID.keySet())
 			splitID.add(keys);
-		for (Map.Entry<String, String[]> entry : Validator.exprfieldList.entrySet()) {
-			if (!splitID.contains(entry.getKey()))
-				throw new Exception(
-						"Expression field " + entry.getKey() + " is not contained in filterdata. No Split performed.");
+		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
+			if (!(entry.getValue() == null || splitID.contains(entry.getKey())))
+				throw new Exception("Expression field " + entry.getKey() + " is not contained in filterdata. No Split performed.");
 		}
 		for (String eachID : splitID)
 			if (!Validator.exprfieldList.containsKey(eachID))
 				splitID.remove(eachID);
-		loadDataTriplet(allRows, header, splitID, triplet, triplet_equals);
+		loadDataObject(allRows, header, splitID);
 		cr.close();
 	}
 
-	void loadDataXLSX(HashMap<String, HashSet<String[]>> triplet, HashMap<String[], HashSet<String>> triplet_equals, String splitDataPath) throws Exception {
+	public void loadDataXLSX() throws Exception {
 		FileInputStream in_ft = new FileInputStream(splitDataPath);
 		Workbook workbook = new XSSFWorkbook(in_ft);
 		Sheet datasheet = workbook.getSheetAt(0);
@@ -76,9 +88,9 @@ public class LoadData {
 			Row thisrow = eachrow.next();
 			for (Cell eachColumn : thisrow) {
 				if (eachColumn.getCellType() == CellType.FORMULA)
-					throw new Exception("Header Cells cannot have formulas within.");
+					throw new Exception("Data File header cannot have formula.");
 				if (formatter.formatCellValue(eachColumn).strip().isBlank())
-					throw new Exception("Data File header can not be empty");
+					throw new Exception("Data File header can not be empty.");
 				header.add(formatter.formatCellValue(eachColumn).strip());
 			}
 			break;
@@ -86,11 +98,11 @@ public class LoadData {
 		List<String> splitID = new ArrayList<String>();
 		HashMap<String, Integer> distinctID = new HashMap<String, Integer>();
 		for (int i = 0; i < header.size(); i++) {
-			if (i != 0 && header.get(i).equalsIgnoreCase("matchType")
-					&& header.get(i - 1).equalsIgnoreCase("matchType"))
-				throw new Exception("datafile cannot have consequtive field descriptor matchType.");
+			if (i != 0 && header.get(i).equalsIgnoreCase("matchType") && header.get(i - 1).equalsIgnoreCase("matchType"))
+				throw new Exception("Datafile cannot have consequtive field descriptor matchType.");
 			if (header.get(i).equalsIgnoreCase("matchType"))
 				continue;
+			// TODO to add conditions for catastrophic consequences for a header coming with same [.*] appended multiple times.
 			if (!distinctID.containsKey(header.get(i))) {
 				distinctID.put(header.get(i), 0);
 				if (!header.get(i).matches(".*\\[\\s*\\d+\\s*\\]$"))
@@ -99,6 +111,7 @@ public class LoadData {
 					splitID.add(header.get(i));
 			} else {
 				int ID_idx = distinctID.get(header.get(i)) + 1;
+				distinctID.put(header.get(i), ID_idx);
 				if (!header.get(i).matches(".*\\[\\s*\\d+\\s*\\]$"))
 					splitID.add(header.get(i) + "[" + ID_idx + "]");
 				else
@@ -107,10 +120,9 @@ public class LoadData {
 		}
 		for (String keys : distinctID.keySet())
 			splitID.add(keys);
-		for (Map.Entry<String, String[]> entry : Validator.exprfieldList.entrySet()) {
-			if (!(splitID.contains(entry.getKey()) || entry.getValue()[0].equals("exists")))
-				throw new Exception(
-						"Expression field " + entry.getKey() + " is not contained in filterdata. No Split performed.");
+		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
+			if (!(entry.getValue() == null || splitID.contains(entry.getKey())))
+				throw new Exception("Expression field '" + entry.getKey() + "' not contained in filterdata. No Split performed.");
 		}
 		List<String[]> allRows = new ArrayList<String[]>();
 		while (eachrow.hasNext()) {
@@ -148,221 +160,96 @@ public class LoadData {
 					blankrowcheck = false;
 			}
 			if (blankrowcheck)
-				break;
+				continue;
 			allRows.add(row);
 		}
-		loadDataTriplet(allRows, header, splitID, triplet, triplet_equals);
+		loadDataObject(allRows, header, splitID);
 	}
 
-	void loadDataTriplet(List<String[]> allRows, List<String> header, List<String> splitID,
-			HashMap<String, HashSet<String[]>> triplet, HashMap<String[], HashSet<String>> triplet_equals) throws Exception {
+	void loadDataObject(List<String[]> allRows, List<String> header, List<String> splitID) throws Exception {
 //		System.out.println(allRows.size());
+		String cellValue = "", data = "";
 		for (int row_idx = 0; row_idx < allRows.size(); row_idx++) {
 			int skipCount = 0;
 			for (int i = 0; i < allRows.get(row_idx).length; i++) {
-				String value = allRows.get(row_idx)[i].strip();
-				String split_field = "", header_field = header.get(i);
+				cellValue = allRows.get(row_idx)[i].strip();
+				header_field = header.get(i);
 				if (header_field.equalsIgnoreCase("matchType")) {
 					skipCount++;
 					header_field = header.get(++i);
 					split_field = splitID.get(i - skipCount);
-					boolean load_splitID = Validator.exprfieldList.containsKey(split_field)
-							&& !Validator.exprfieldList.get(split_field)[0].equals("exists");
-					boolean load_headerID = Validator.exprfieldList.containsKey(header_field)
-							&& !Validator.exprfieldList.get(header_field)[0].equals("exists");
-					if (!(load_splitID || load_headerID))
-						continue;
-					String data = allRows.get(row_idx)[i].strip();
-					String[] dataProp = new String[5];
-					if (value.isEmpty()) {
+					data = allRows.get(row_idx)[i].strip();
+					if (cellValue.isEmpty()) {
 						try {
-							dataProp = mpv.valdateMP(Validator.exprfieldList.get(header_field), value);
-							} catch (Exception e) {
-								System.out.println(e.getMessage());
-								System.err.println("Need to correct error display.. Originiating from config matchType resolution module.");
-								throw new Exception("DataSet Value " + value + " error at column " + i + " row " + row_idx);
+							if (Validator.exprfieldList.containsKey(split_field) && Validator.exprfieldList.get(split_field) != null) {
+								if (Validator.exprfieldList.get(split_field).genericDefinition != null) {
+								data = dv.validateData(Validator.exprfieldList.get(split_field).genericDefinition, data);
+									Validator.exprfieldList.get(split_field).loadConstPatterns(data);
+								}
+								else
+									throw new DataStructureException("No generic definiton found.");
 							}
-						if (load_splitID) {
-							if (!triplet.containsKey(split_field)) {
-								HashSet<String[]> values = new HashSet<String[]>();
-								values.add(dataProp);
-								triplet.put(split_field, values);
-							} else {
-								triplet.get(split_field).add(dataProp);
+							if (Validator.exprfieldList.containsKey(header_field) && Validator.exprfieldList.get(header_field) != null) {
+								if (Validator.exprfieldList.get(header_field).genericDefinition != null) {
+									data = dv.validateData(Validator.exprfieldList.get(header_field).genericDefinition, data);
+									Validator.exprfieldList.get(header_field).loadConstPatterns(data);
+								}
+								else
+									throw new DataStructureException("No generic definiton found.");
 							}
-						}
-						if (load_headerID) {
-							if (!triplet.containsKey(header_field)) {
-								HashSet<String[]> values = new HashSet<String[]>();
-								values.add(dataProp);
-								triplet.put(header_field, values);
-							} else {
-								triplet.get(header_field).add(dataProp);
-							}
+						} catch (DataFormatException e) {
+							System.out.println(e.getMessage());
+							System.out.println("DataSet Value " + cellValue + " error at column " + i + " row " + row_idx);
+						} catch (DataStructureException e) {
+							System.out.println(e.getMessage());
+							throw new Exception("DataSet MatchProperty Undefined for column '" + i + "'");
 						}
 					} else {
-						String[] matchProp = value.split(":");
-						for(int m_i = 0; m_i < matchProp.length; m_i++)
-							matchProp[m_i] = matchProp[m_i].strip().toLowerCase();
+						ArrayList<String> matchProp = new ArrayList(Arrays.asList(cellValue.split(":")));
 						try {
-						dataProp = mpv.valdateMP(matchProp, data);
-						System.out.println(dataProp.length);
-						} catch (Exception e) {
+							mpv.validateMP(matchProp);
+							data = dv.validateData(matchProp, data);
+							if (Validator.exprfieldList.containsKey(split_field) && Validator.exprfieldList.get(split_field) != null)
+								Validator.exprfieldList.get(split_field).loadVariablePatterns(matchProp, data);
+							if (Validator.exprfieldList.containsKey(header_field) && Validator.exprfieldList.get(header_field) != null)
+								Validator.exprfieldList.get(header_field).loadVariablePatterns(matchProp, data);
+						} catch (DataFormatException e) {
 							System.out.println(e.getMessage());
-							throw new Exception("DataSet Value " + value + " error at column " + i + " row " + row_idx);
-						}
-						if (load_splitID) {
-							if (dataProp[1].equalsIgnoreCase("equals")) {
-								if (!triplet_equals.isEmpty()) {
-									boolean keyMatch = false;
-									for (String[] key : triplet_equals.keySet()) {
-										if (key[0].equalsIgnoreCase(split_field)
-												&& key[1].equalsIgnoreCase(dataProp[2])) {
-											keyMatch = true;
-											triplet_equals.get(key).add(dataProp[0]);
-											break;
-										}
-										if (!keyMatch) {
-											HashSet<String> values = new HashSet<String>();
-											values.add(dataProp[0]);
-											triplet_equals.put(new String[] { split_field, dataProp[2] }, values);
-										}
-									}
-								} else {
-									HashSet<String> values = new HashSet<String>();
-									values.add(dataProp[0]);
-									triplet_equals.put(new String[] { split_field, dataProp[2] }, values);
-								}
-							}
-							else {
-								if (!triplet.containsKey(split_field)) {
-									HashSet<String[]> values = new HashSet<String[]>();
-									values.add(dataProp);
-									triplet.put(split_field, values);
-								} else {
-									triplet.get(split_field).add(dataProp);
-								}
-							}
-						}
-						if (load_headerID) {
-							if (dataProp[1].equalsIgnoreCase("equals")) {
-								if (!triplet_equals.isEmpty()) {
-									boolean keyMatch = false;
-									for (String[] key : triplet_equals.keySet()) {
-										if (key[0].equalsIgnoreCase(split_field)
-												&& key[1].equalsIgnoreCase(dataProp[2])) {
-											keyMatch = true;
-											triplet_equals.get(key).add(dataProp[0]);
-											break;
-										}
-										if (!keyMatch) {
-											HashSet<String> values = new HashSet<String>();
-											values.add(dataProp[0]);
-											triplet_equals.put(new String[] { split_field, dataProp[2] }, values);
-										}
-									}
-								} else {
-									HashSet<String> values = new HashSet<String>();
-									values.add(dataProp[0]);
-									triplet_equals.put(new String[] { split_field, dataProp[2] }, values);
-								}
-							}
-							else {
-								if (!triplet.containsKey(split_field)) {
-									HashSet<String[]> values = new HashSet<String[]>();
-									values.add(dataProp);
-									triplet.put(split_field, values);
-								} else {
-									triplet.get(split_field).add(dataProp);
-								}
-							}
+							System.out.println("DataSet Value " + cellValue + " error at column " + i + " row " + row_idx);
+						} catch (DataStructureException e) {
+							System.out.println(e.getMessage());
+							throw new Exception("DataSet MatchProperty Undefined for column '" + i + "'");
 						}
 					}
 				} else {
 					split_field = splitID.get(i - skipCount);
-					boolean load_splitID = Validator.exprfieldList.containsKey(split_field)
-							&& !Validator.exprfieldList.get(split_field)[0].equals("exists");
-					boolean load_headerID = Validator.exprfieldList.containsKey(header_field)
-							&& !Validator.exprfieldList.get(header_field)[0].equals("exists");
-					if (!(load_splitID || load_headerID))
-						continue;
-					String[] dataProp = new String[5];;
+					data = cellValue;
 					try {
-						dataProp = mpv.valdateMP(Validator.exprfieldList.get(header_field), value);
-						} catch (Exception e) {
-							System.out.println(e.getMessage());
-							System.err.println("Need to correct error display.. Originiating from config matchType resolution module.");
-							throw new Exception("DataSet Value " + value + " error at column " + i + " row " + row_idx);
-						}
-					if (load_splitID) {
-						if (dataProp[1].equalsIgnoreCase("equals")) {
-							if (!triplet_equals.isEmpty()) {
-								boolean keyMatch = false;
-								for (String[] key : triplet_equals.keySet()) {
-									if (key[0].equalsIgnoreCase(split_field)
-											&& key[1].equalsIgnoreCase(dataProp[2])) {
-										keyMatch = true;
-										triplet_equals.get(key).add(dataProp[0]);
-										break;
-									}
-									if (!keyMatch) {
-										HashSet<String> values = new HashSet<String>();
-										values.add(dataProp[0]);
-										triplet_equals.put(new String[] { split_field, dataProp[2] }, values);
-									}
-								}
-							} else {
-								HashSet<String> values = new HashSet<String>();
-								values.add(dataProp[0]);
-								triplet_equals.put(new String[] { split_field, dataProp[2] }, values);
+						if (Validator.exprfieldList.containsKey(split_field) && Validator.exprfieldList.get(split_field) != null) {
+							if (Validator.exprfieldList.get(split_field).genericDefinition != null) {
+							data = dv.validateData(Validator.exprfieldList.get(split_field).genericDefinition, data);
+								Validator.exprfieldList.get(split_field).loadConstPatterns(data);
 							}
+							else
+								throw new DataStructureException("No generic definiton found.");
 						}
-						else {
-							if (!triplet.containsKey(split_field)) {
-								HashSet<String[]> values = new HashSet<String[]>();
-								values.add(dataProp);
-								triplet.put(split_field, values);
-							} else {
-								triplet.get(split_field).add(dataProp);
+						if (Validator.exprfieldList.containsKey(header_field) && Validator.exprfieldList.get(header_field) != null) {
+							if (Validator.exprfieldList.get(header_field).genericDefinition != null) {
+								data = dv.validateData(Validator.exprfieldList.get(header_field).genericDefinition, data);
+								Validator.exprfieldList.get(header_field).loadConstPatterns(data);
 							}
+							else
+								throw new DataStructureException("No generic definiton found.");
 						}
-					}
-					if (load_headerID) {
-						if (dataProp[1].equalsIgnoreCase("equals")) {
-							if (!triplet_equals.isEmpty()) {
-								boolean keyMatch = false;
-								for (String[] key : triplet_equals.keySet()) {
-									if (key[0].equalsIgnoreCase(header_field)
-											&& key[1].equalsIgnoreCase(dataProp[2])) {
-										keyMatch = true;
-										triplet_equals.get(key).add(dataProp[0]);
-										break;
-									}
-									if (!keyMatch) {
-										HashSet<String> values = new HashSet<String>();
-										values.add(dataProp[0]);
-										triplet_equals.put(new String[] { header_field, dataProp[2] }, values);
-									}
-								}
-							} else {
-								HashSet<String> values = new HashSet<String>();
-								values.add(dataProp[0]);
-								triplet_equals.put(new String[] { header_field, dataProp[2] }, values);
-							}
-						}
-						else {
-							if (!triplet.containsKey(header_field)) {
-								HashSet<String[]> values = new HashSet<String[]>();
-								values.add(dataProp);
-								triplet.put(header_field, values);
-							} else {
-								triplet.get(header_field).add(dataProp);
-							}
-						}
+					} catch (DataFormatException e) {
+						System.out.println(e.getMessage());
+						System.out.println("DataSet Value " + cellValue + " error at column " + i + " row " + row_idx);
+					} catch (DataStructureException e) {
+						System.out.println(e.getMessage());
+						throw new Exception("DataSet MatchProperty Undefined for column '" + i + "'");
 					}
 				}
 			}
 		}
 	}
-
 }

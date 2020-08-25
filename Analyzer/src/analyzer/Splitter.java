@@ -37,11 +37,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import engine.BooleanParser;
+import analyzer.Engine.BooleanParser;
+import analyzer.Validators.Validator;
 
 public class Splitter {
-	static String reportDest = "", dest_matched = "", dest_unmatched = "", report_matched = "", report_unmatched = "",
-			dataReadPath = "", csvconfigPath = "";
+	static String reportDest = "", dest_matched = "", dest_unmatched = "", report_matched = "", report_unmatched = "", dataReadPath = "", csvconfigPath = "";
 	static String[] sourceList = null;
 	static boolean isReport = false, dataOnly = false;
 	boolean writetomatch = true;
@@ -49,7 +49,7 @@ public class Splitter {
 	WriteToCSV reportWriter = null;
 	Validator new_validator = null;
 	int match_count = 0, unmatch_count = 0, count_item = 0;
-	
+
 	public Splitter(Validator in) throws Exception {
 		this.new_validator = in;
 	}
@@ -61,176 +61,170 @@ public class Splitter {
 		TarArchiveOutputStream tos_match = null;
 		TarArchiveOutputStream tos_unmatch = null;
 		if (!isReport) {
-			FileOutputStream fos_match = new FileOutputStream(dest_matched);
-			GZIPOutputStream gos_match = new GZIPOutputStream(new BufferedOutputStream(fos_match));
-			tos_match = new TarArchiveOutputStream(gos_match);
-			tos_match.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-			FileOutputStream fos_unmatch = new FileOutputStream(dest_unmatched);
-			GZIPOutputStream gos_unmatch = new GZIPOutputStream(new BufferedOutputStream(fos_unmatch));
-			tos_unmatch = new TarArchiveOutputStream(gos_unmatch);
-			tos_unmatch.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-			if(!dataOnly) {
-				report_matched = reportDest + "/matched-data-report";
-				report_unmatched = reportDest + "/unmatched-data-report";
+			if (!dest_matched.isEmpty()) {
+				FileOutputStream fos_match = new FileOutputStream(dest_matched);
+				GZIPOutputStream gos_match = new GZIPOutputStream(new BufferedOutputStream(fos_match));
+				tos_match = new TarArchiveOutputStream(gos_match);
+				tos_match.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
 			}
-		} else if (new_validator == null) {
-			report_matched = reportDest + "/data-report";
-		} else if (!(dest_matched.isBlank() || dest_unmatched.isBlank())) {
-			if (dest_matched.endsWith("tar.gz"))
-				report_matched = dest_matched.replace(".tar.gz","") + "_report";
-			else
-				report_matched = dest_matched;
-			if (dest_unmatched.endsWith("tar.gz"))
-				report_unmatched = dest_unmatched.replace(".tar.gz","") + "_report";
-			else
-				report_unmatched = dest_unmatched;
-		} else if (!reportDest.isBlank()) {
-			report_matched = reportDest + "/matched-data-report";
-			report_unmatched = reportDest + "/unmatched-data-report";
-		} else
-			throw new Exception("Data Destination not available for non-empty filter criteria.");
+			if (!dest_unmatched.isEmpty()) {
+				FileOutputStream fos_unmatch = new FileOutputStream(dest_unmatched);
+				GZIPOutputStream gos_unmatch = new GZIPOutputStream(new BufferedOutputStream(fos_unmatch));
+				tos_unmatch = new TarArchiveOutputStream(gos_unmatch);
+				tos_unmatch.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+			}
+		}
 		reportWriter = new WriteToCSV();
-		for(String source : sourceList){
-		File input_tar_gz = new File(source);
-		String tarPath = input_tar_gz.getAbsolutePath();
-		File tarFile = deCompressGZipFile(input_tar_gz, new File(tarPath.replace(".gz", "")));
-		FileInputStream fis = new FileInputStream(tarFile);
-		TarArchiveInputStream tis = new TarArchiveInputStream(fis);
-		TarArchiveEntry in_tarEntry = null;
-		String parentDir = "";
-		HashMap<String, byte[]> entryMap = new HashMap<String, byte[]>();
-		long st_time = System.currentTimeMillis();
-		while ((in_tarEntry = tis.getNextTarEntry()) != null) {
-			String tarEntryName = in_tarEntry.getName();
-			if (!tarEntryName.contains(dataReadPath))
-				continue;
-			String parent_entry = tarEntryName.replaceAll("/$", "").replaceAll("(.*)[/\\\\].*", "$1");
-			if (in_tarEntry.isFile()) {
-				if (!parentDir.equals(parent_entry)) {
-					if (!sourceDict.isEmpty()) {
-						writetomatch = true;
-						if (new_validator != null)
-							writetomatch = new_validator.validate(sourceDict);
-						if(!dataOnly)
-							reportWriter.csvloader(sourceDict, writetomatch);
-						if (!isReport) {
-							for (Map.Entry<String, byte[]> dataentry : entryMap.entrySet()) {
-								TarArchiveEntry out_tarEntry = new TarArchiveEntry(dataentry.getKey());
-								out_tarEntry.setSize(dataentry.getValue().length);
-								if (writetomatch) {
-									tos_match.putArchiveEntry(out_tarEntry);
-									tos_match.write(dataentry.getValue());
-									tos_match.closeArchiveEntry();
+		for (String source : sourceList) {
+			File input_tar_gz = new File(source);
+			String tarPath = input_tar_gz.getAbsolutePath();
+			File tarFile = deCompressGZipFile(input_tar_gz, new File(tarPath.replace(".gz", "")));
+			FileInputStream fis = new FileInputStream(tarFile);
+			TarArchiveInputStream tis = new TarArchiveInputStream(fis);
+			TarArchiveEntry in_tarEntry = null;
+			String parentDir = "";
+			HashMap<String, byte[]> entryMap = new HashMap<String, byte[]>();
+			long st_time = System.currentTimeMillis();
+			while ((in_tarEntry = tis.getNextTarEntry()) != null) {
+				String tarEntryName = in_tarEntry.getName();
+				if (!tarEntryName.contains(dataReadPath))
+					continue;
+				String parent_entry = tarEntryName.replaceAll("/$", "").replaceAll("(.*)[/\\\\].*", "$1");
+				if (in_tarEntry.isFile()) {
+					if (!parentDir.equals(parent_entry)) {
+						if (!sourceDict.isEmpty()) {
+							writetomatch = true;
+							if (new_validator != null)
+								writetomatch = new_validator.validate(sourceDict);
+							if (!dataOnly)
+								reportWriter.csvloader(sourceDict, writetomatch);
+							if (!isReport) {
+								for (Map.Entry<String, byte[]> dataentry : entryMap.entrySet()) {
+									TarArchiveEntry out_tarEntry = new TarArchiveEntry(dataentry.getKey());
+									out_tarEntry.setSize(dataentry.getValue().length);
+									if (writetomatch && tos_match != null) {
+										tos_match.putArchiveEntry(out_tarEntry);
+										tos_match.write(dataentry.getValue());
+										tos_match.closeArchiveEntry();
+									} else if (tos_unmatch != null) {
+										tos_unmatch.putArchiveEntry(out_tarEntry);
+										tos_unmatch.write(dataentry.getValue());
+										tos_unmatch.closeArchiveEntry();
+									}
+								}
+							}
+							if (writetomatch)
+								match_count++;
+							else
+								unmatch_count++;
+							entryMap.clear();
+							sourceDict.clear();
+							count_item++;
+							if (count_item % 10000 == 0) {
+								long time = System.currentTimeMillis();
+								float elapsed_time = (time - st_time);
+								if (elapsed_time / 60000 < 1) {
+									elapsed_time = elapsed_time / 1000;
+									System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + Math.round(elapsed_time * 100) / 100
+											+ " seconds.");
 								} else {
-									tos_unmatch.putArchiveEntry(out_tarEntry);
-									tos_unmatch.write(dataentry.getValue());
-									tos_unmatch.closeArchiveEntry();
+									elapsed_time = elapsed_time / 1000;
+									float elapsed_min = elapsed_time / 60;
+									float elapsed_sec = elapsed_time % 60;
+									System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + Math.round(elapsed_min * 100) / 100
+											+ " mins " + Math.round(elapsed_sec * 100) / 100 + " seconds.");
 								}
 							}
 						}
-						if (writetomatch)
-							match_count++;
-						else
-							unmatch_count++;
-						entryMap.clear();
-						sourceDict.clear();
-						count_item++;
-						if (count_item % 10000 == 0) {
-							long time = System.currentTimeMillis();
-							float elapsed_time = (time - st_time);
-							if (elapsed_time / 60000 < 1) {
-								elapsed_time = elapsed_time / 1000;
-								System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in "
-										+ Math.round(elapsed_time * 100) / 100 + " seconds.");
-							} else {
-								elapsed_time = elapsed_time / 1000;
-								float elapsed_min = elapsed_time / 60;
-								float elapsed_sec = elapsed_time % 60;
-								System.out.println(
-										"Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + Math.round(elapsed_min * 100) / 100
-										+ " mins " + Math.round(elapsed_sec * 100) / 100 + " seconds.");
+						parentDir = parent_entry;
+					}
+					byte[] content = new byte[(int) in_tarEntry.getSize()];
+					int offset = 0;
+					tis.read(content, offset, content.length - offset);
+					tarEntryName = tarEntryName.replace(trimPath, "");
+					if (!isReport)
+						entryMap.put(tarEntryName, content);
+					if (tarEntryName.endsWith(".xml")) {
+						String contentString = new String(content);
+						getSourceInfo(contentString);
+					} else if (tarEntryName.endsWith("handle")) {
+						String handle = new String(content).strip();
+						sourceDict.put("handle_ID", new HashSet<String>() {
+							{
+								add(handle);
 							}
-						}
-					}
-					parentDir = parent_entry;
-				}
-				byte[] content = new byte[(int) in_tarEntry.getSize()];
-				int offset = 0;
-				tis.read(content, offset, content.length - offset);
-				tarEntryName = tarEntryName.replace(trimPath, "");
-				if (!isReport)
-					entryMap.put(tarEntryName, content);
-				if (tarEntryName.endsWith(".xml")) {
-					String contentString = new String(content);
-					getSourceInfo(contentString);
-				} else if (tarEntryName.endsWith("handle")) {
-					String handle = new String(content).strip();
-					sourceDict.put("handle_ID", new HashSet<String>() {
-						{
-							add(handle);
-						}
-					});
-				}
-			}
-		}
-		if (!sourceDict.isEmpty()) {
-			writetomatch = true;
-			if (new_validator != null)
-				writetomatch = new_validator.validate(sourceDict);
-			if(!dataOnly)
-				reportWriter.csvloader(sourceDict, writetomatch);
-			if (writetomatch)
-				match_count++;
-			else
-				unmatch_count++;
-			if (!isReport) {
-				for (Map.Entry<String, byte[]> dataentry : entryMap.entrySet()) {
-					TarArchiveEntry out_tarEntry = new TarArchiveEntry(dataentry.getKey());
-					out_tarEntry.setSize(dataentry.getValue().length);
-					if (writetomatch) {
-						tos_match.putArchiveEntry(out_tarEntry);
-						tos_match.write(dataentry.getValue());
-						tos_match.closeArchiveEntry();
-					} else {
-						tos_unmatch.putArchiveEntry(out_tarEntry);
-						tos_unmatch.write(dataentry.getValue());
-						tos_unmatch.closeArchiveEntry();
+						});
 					}
 				}
 			}
-		}
-		entryMap.clear();
-		sourceDict.clear();
-		count_item++;
-		if (count_item % 10000 != 0) {
-			long time = System.currentTimeMillis();
-			float elapsed_time = (time - st_time);
-			if (elapsed_time / 60000 < 1) {
-				elapsed_time = elapsed_time / 1000;
-				System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + elapsed_time + " seconds.");
-			} else {
-				elapsed_time = elapsed_time / 1000;
-				float elapsed_min = elapsed_time / 60;
-				float elapsed_sec = elapsed_time % 60;
-				System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + elapsed_min + " mins " + elapsed_sec
-						+ " seconds.");
+			if (!sourceDict.isEmpty()) {
+				writetomatch = true;
+				if (new_validator != null)
+					writetomatch = new_validator.validate(sourceDict);
+				if (!dataOnly)
+					reportWriter.csvloader(sourceDict, writetomatch);
+				if (writetomatch)
+					match_count++;
+				else
+					unmatch_count++;
+				if (!isReport) {
+					for (Map.Entry<String, byte[]> dataentry : entryMap.entrySet()) {
+						TarArchiveEntry out_tarEntry = new TarArchiveEntry(dataentry.getKey());
+						out_tarEntry.setSize(dataentry.getValue().length);
+						if (writetomatch && tos_match != null) {
+							tos_match.putArchiveEntry(out_tarEntry);
+							tos_match.write(dataentry.getValue());
+							tos_match.closeArchiveEntry();
+						} else if (tos_unmatch != null) {
+							tos_unmatch.putArchiveEntry(out_tarEntry);
+							tos_unmatch.write(dataentry.getValue());
+							tos_unmatch.closeArchiveEntry();
+						}
+					}
+				}
 			}
+			entryMap.clear();
+			sourceDict.clear();
+			count_item++;
+			if (count_item % 10000 != 0) {
+				long time = System.currentTimeMillis();
+				float elapsed_time = (time - st_time);
+				if (elapsed_time / 60000 < 1) {
+					elapsed_time = elapsed_time / 1000;
+					System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + elapsed_time + " seconds.");
+				} else {
+					elapsed_time = elapsed_time / 1000;
+					float elapsed_min = elapsed_time / 60;
+					float elapsed_sec = elapsed_time % 60;
+					System.out.println("Processed (" + input_tar_gz.getName() + ") " + count_item + " records in " + elapsed_min + " mins " + elapsed_sec + " seconds.");
+				}
+			}
+			tis.close();
+			if (!report_matched.isEmpty())
+				reportWriter.csvwriter_matched();
+			if (!report_unmatched.isEmpty())
+				reportWriter.csvwriter_unmatched();
+			tarFile.delete();
 		}
-		tis.close();
-		reportWriter.csvwriter();
-		tarFile.delete();
-	}
 		if (!isReport) {
-			tos_match.close();
-			tos_unmatch.close();
+			if (tos_match != null)
+				tos_match.close();
+			if (tos_unmatch != null)
+				tos_unmatch.close();
 		}
 		System.out.println("Matched #:" + match_count + "  UnMatched #:" + unmatch_count);
-		if (!isReport) {
-			System.out.println("Matched Data Destination: " + dest_matched);
-			System.out.println("UnMatched Data Destination: " + dest_unmatched);
-			System.out.println("Report Destination: " + reportDest);
-		} else if (new_validator != null)
-			System.out.println("Report Destination: " + reportDest);
+		if (new_validator == null)
+			System.out.println("Report Destination: " + report_matched);
+		else {
+			if(!(dest_matched.isEmpty() || isReport))
+				System.out.println("Matched Data Destination: " + dest_matched);
+			if(!(dest_unmatched.isEmpty()||isReport))
+				System.out.println("UnMatched Data Destination: " + dest_unmatched);
+			if(!report_matched.isEmpty())
+				System.out.println("Matched Report Destination: " + report_matched);
+			if(!report_unmatched.isEmpty())
+				System.out.println("UnMatched Report Destination: " + report_unmatched);
+		}
 	}
 
 	void getSourceInfo(String itemContent) throws Exception {

@@ -7,18 +7,22 @@ import java.io.PrintStream;
 import java.util.Properties;
 import java.util.Scanner;
 
+import analyzer.Validators.Validator;
+
 /**
- * Analyzer Wrapper. Wraps calls to all other underlying classes and methods. 
- * @author user
+ * Analyzer Wrapper. Wraps calls to all other underlying classes and methods.
+ * 
+ * @author arunavo.banerjee.cse16@gmail.com
  *
  */
 public class Analyzer {
 	static Scanner in = new Scanner(System.in);
+
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		long time = System.currentTimeMillis();
 		String reportType = args[0];
-		if(reportType.equalsIgnoreCase("-d"))
+		if (reportType.equalsIgnoreCase("-d"))
 			Splitter.isReport = false;
 		else if (reportType.equalsIgnoreCase("-r"))
 			Splitter.isReport = true;
@@ -31,78 +35,133 @@ public class Analyzer {
 		File properties = new File(propPath);
 		InputStream input = new FileInputStream(properties);
 		prop.load(input);
-		if (prop.getProperty("matchType") != null) {
-			Validator.matchType = prop.getProperty("matchType").strip().toLowerCase();
-			if (!(Validator.matchType.isBlank() || Validator.matchType.matches("(?i)startsWith|endsWith|contains|matches|equals|exists|dupl")))
-				throw new Exception("Property matchType has wrong definition : " + Validator.matchType
-						+ "\nValid values are startsWith|endsWith|contains|matches|exists|dupl");
-		}
-		if (prop.getProperty("matchCase") != null) {
-			Validator.matchCase = prop.getProperty("matchCase").strip().toLowerCase();
-			if (!(Validator.matchCase.isBlank() || Validator.matchCase.matches("(?i)fold|no-fold")))
-				throw new Exception("Property matchCase has wrong definition : " + Validator.matchCase 
-						+ "\nValid Values are fold|no-fold");
-		}
-		if (prop.getProperty("dataType") != null) {
-			Validator.dataType = prop.getProperty("dataType").strip().toLowerCase();
-			if (!(Validator.dataType.isBlank() || Validator.dataType.matches("(?i)str|regx")))
-				throw new Exception("Property dataType has wrong definition : " + Validator.dataType 
-						+ "\nValid Values are str|regx");
-		}
-		if(Validator.matchType.equals("equals") && Validator.dataType.equals("regx"))
-			throw new Exception("Analyser condition conflict.\nmatchType=equals can not be combined with dataType=regx. Please refer documentation.");
+
+		/**
+		 * Set Validator parameters and verify.
+		 */
+		if (prop.getProperty("dataType") != null)
+			Validator.dataType = prop.getProperty("dataType").strip();
+		if (prop.getProperty("matchType") != null)
+			Validator.matchType = prop.getProperty("matchType").strip();
+		if (prop.getProperty("matchCase") != null)
+			Validator.matchCase = prop.getProperty("matchCase").strip();
+		if (prop.getProperty("leftTokenizer") != null)
+			Validator.left_token = prop.getProperty("leftTokenizer").strip();
+		if (prop.getProperty("rightTokenizer") != null)
+			Validator.right_token = prop.getProperty("rightTokenizer").strip();
 		if (prop.getProperty("splitExpression") != null)
-			Validator.expr_str = prop.getProperty("splitExpression").replaceAll("\\s*:\\s*", ":");
-		else if (!Splitter.isReport && (prop.getProperty("splitExpression") == null || prop.getProperty("splitExpression").strip().isEmpty()))
+			Validator.expr_str = prop.getProperty("splitExpression").strip().replaceAll("\\s*:\\s*", ":");
+		else if (!Splitter.isReport && Validator.expr_str.isEmpty())
 			throw new Exception("Split Expression is mandatory for data splitting.");
 		if (prop.getProperty("splitListFile") != null)
-			Validator.splitlistPath = prop.getProperty("splitListFile");
+			Validator.splitlistPath = prop.getProperty("splitListFile").strip();
+		
 		Validator new_validator = null;
-		if(!(reportType.equals("-r") && Validator.expr_str.isBlank())) {
+		if (!(reportType.equals("-r") && Validator.expr_str.isBlank())) {
 			new_validator = new Validator();
 		}
+		
 		Splitter.sourceList = prop.getProperty("sourceFile").split(",");
-		if(prop.getProperty("targetFileMatched") != null)
+		if (prop.getProperty("targetFileMatched") != null)
 			Splitter.dest_matched = prop.getProperty("targetFileMatched").strip();
-		if(prop.getProperty("targetFileUnMatched") != null)
+		if (prop.getProperty("targetFileUnMatched") != null)
 			Splitter.dest_unmatched = prop.getProperty("targetFileUnMatched").strip();
-		if (new File(Splitter.dest_matched).exists())
+		if (new File(Splitter.dest_matched).exists() && !Splitter.isReport)
 			new File(Splitter.dest_matched).delete();
-		if (new File(Splitter.dest_unmatched).exists())
+		if (new File(Splitter.dest_unmatched).exists() && !Splitter.isReport)
 			new File(Splitter.dest_unmatched).delete();
-		if(prop.getProperty("reportDestination") == null || prop.getProperty("reportDestination").isBlank()) {
-			if(Splitter.isReport) {
-				throw new Exception("Report destination mandatory for -r Flag.");
-			}
-			else {
-				System.out.println("Report Destination not provided. No report will be generated. Continue? (Y/N)");
-				String runFlag = in.next();
-				in.close();
-				if(runFlag.equalsIgnoreCase("y")) {
-					Splitter.dataOnly = true;
-				}
-				else if (runFlag.equalsIgnoreCase("n")) {
-					throw new Exception("Program terminated as per user's request");
-				}
-			}
-		} else
+		if (prop.getProperty("reportDestination") != null)
 			Splitter.reportDest = prop.getProperty("reportDestination").strip();
+
+		// Running options validation and control settings.
+		validate_input_conditions(new_validator);
+		
 		if (prop.getProperty("dataReadPath") != null)
 			Splitter.dataReadPath = prop.getProperty("dataReadPath");
 		if (prop.getProperty("csvconfigPath") != null)
 			Splitter.csvconfigPath = prop.getProperty("csvconfigPath");
+		
 		Splitter newSplit = new Splitter(new_validator);
 		newSplit.churnData();
+
 		long elapsed_time = (System.currentTimeMillis() - time);
 		if (elapsed_time / 60000 < 1) {
 			elapsed_time = elapsed_time / 1000;
-			System.out.println("Total Processing Time " + Math.round(elapsed_time*100)/100 + " seconds.");
+			System.out.println("Total Processing Time " + Math.round(elapsed_time * 100) / 100 + " seconds.");
 		} else {
 			elapsed_time = elapsed_time / 1000;
 			float elapsed_min = elapsed_time / 60;
 			float elapsed_sec = elapsed_time % 60;
-			System.out.println("Total Processing Time " + Math.round(elapsed_min) + " mins "
-					+ Math.round(elapsed_sec*100)/100 + " seconds.");
+			System.out.println("Total Processing Time " + Math.round(elapsed_min) + " mins " + Math.round(elapsed_sec * 100) / 100 + " seconds.");
+		}
+	}
+
+	/**
+	 * Validate the input condition variations and set the variables accordingly.
+	 * 
+	 * @param new_validator
+	 * @throws Exception
+	 */
+	static void validate_input_conditions(Validator new_validator) throws Exception {
+		if (Splitter.isReport) {
+			if (Splitter.dest_matched.isEmpty() && Splitter.dest_unmatched.isEmpty() && Splitter.reportDest.isEmpty()) {
+				throw new Exception("Report destinations mandatory for -r Flag.");
+			}
+			if (new_validator == null) {
+				if (!Splitter.reportDest.isEmpty())
+					Splitter.report_matched = Splitter.reportDest + File.separatorChar + "data-report";
+				else
+					throw new Exception("Data report need to have mandatory reportDestination value in properties file.");
+			} else if (!(Splitter.dest_matched.isBlank() && Splitter.dest_unmatched.isBlank())) {
+				if (Splitter.dest_matched.endsWith("tar.gz"))
+					Splitter.report_matched = Splitter.dest_matched.replace(".tar.gz", "") + "_report";
+				else
+					Splitter.report_matched = Splitter.dest_matched;
+				if (Splitter.dest_unmatched.endsWith("tar.gz"))
+					Splitter.report_unmatched = Splitter.dest_unmatched.replace(".tar.gz", "") + "_report";
+				else
+					Splitter.report_unmatched = Splitter.dest_unmatched;
+			} else {
+				Splitter.report_matched = Splitter.reportDest + File.separatorChar + "matched-data-report";
+				Splitter.report_unmatched = Splitter.reportDest + File.separatorChar + "unmatched-data-report";
+			}
+		} else {
+			if (Splitter.dest_matched.isEmpty() && Splitter.dest_unmatched.isEmpty()) {
+				throw new Exception("Data destinations mandatory for -d Flag.");
+			} else {
+				System.out.println("Do you want to generate a data report? (Yes/No)");
+				String reportFlag = in.next();
+				if (reportFlag.equalsIgnoreCase("yes")) {
+					System.out.println("Generate report in the data location? (Yes/No)");
+					reportFlag = in.next();
+					if (reportFlag.equalsIgnoreCase("yes")) {
+						if (!Splitter.dest_matched.isEmpty())
+							Splitter.report_matched = Splitter.dest_matched.replace(".tar.gz", "") + "_report";
+						if (!Splitter.dest_unmatched.isEmpty())
+							Splitter.report_unmatched = Splitter.dest_unmatched.replace(".tar.gz", "") + "_report";
+					} else if (reportFlag.equalsIgnoreCase("no")) {
+						if (Splitter.reportDest.isEmpty()) {
+							System.out.println("Report Destination not provided. No report will be generated. Continue? (Yes/No)");
+							reportFlag = in.next();
+							if (reportFlag.equalsIgnoreCase("yes")) {
+								Splitter.dataOnly = true;
+							} else if (reportFlag.equalsIgnoreCase("no")) {
+								in.close();
+								throw new Exception("Program terminated as per user's request");
+							} else {
+								in.close();
+								throw new Exception("Invalid entry : '" + reportFlag + "'");
+							}
+						} else {
+							Splitter.report_matched = Splitter.reportDest + File.separatorChar + "Analyzer_matched-report";
+							Splitter.report_unmatched = Splitter.reportDest + File.separatorChar + "Analyzer_unmatched-report";
+						}
+					} else if (reportFlag.equalsIgnoreCase("no")) {
+						Splitter.dataOnly = true;
+					}
+				}
+				in.close();
+			}
 		}
 	}
 }

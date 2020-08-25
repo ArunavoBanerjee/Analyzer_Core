@@ -16,7 +16,6 @@ public class CSVConfiguration {
 	public CSVConfiguration() throws Exception {
 		Properties prop = new Properties();
 		try {
-//			System.out.println(Splitter.csvconfigPath);
 			InputStream input = null;
 			if(Splitter.csvconfigPath.isBlank()) {
 				input = CSVConfiguration.class.getResourceAsStream("/analyzer/defaultConfig/csvconfig");
