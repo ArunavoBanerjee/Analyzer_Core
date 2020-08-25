@@ -106,7 +106,7 @@ public class Splitter {
 													tos_match = get_tos(matched_tarName);
 												}
 											} else if (!matched_tarName.equals(dest_matched)) {
-												matched_tarName = dest_matched;
+												matched_tarName = dest_matched+".tar.gz";
 												tos_match = get_tos(matched_tarName);
 											}
 											tos_match.putArchiveEntry(out_tarEntry);
@@ -124,7 +124,7 @@ public class Splitter {
 												tos_unmatch = get_tos(unmatched_tarName);
 											}
 										} else if (!unmatched_tarName.equals(dest_unmatched)) {
-											unmatched_tarName = dest_unmatched;
+											unmatched_tarName = dest_unmatched+".tar.gz";
 											tos_unmatch = get_tos(unmatched_tarName);
 										}
 										tos_unmatch.putArchiveEntry(out_tarEntry);
@@ -325,7 +325,7 @@ print_output();
 		else {
 			if (!(dest_matched.isEmpty() || isReport)) {
 			if(batchSize == 0)
-				System.out.println("Matched Data Destination: " + dest_matched);
+				System.out.println("Matched Data Destination: " + matched_tarName);
 			else {
 				System.out.println("Matched Data Destination:");
 				for(String _fileLocation : matchedNameList)
@@ -334,7 +334,7 @@ print_output();
 			}
 			if (!(dest_unmatched.isEmpty() || isReport)) {
 				if(batchSize == 0)
-				System.out.println("UnMatched Data Destination: " + dest_unmatched);
+				System.out.println("UnMatched Data Destination: " + unmatched_tarName);
 				else {
 					System.out.println("UnMatched Data Destination:");
 					for(String _fileLocation : unmatchedNameList)
