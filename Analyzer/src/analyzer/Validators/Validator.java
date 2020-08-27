@@ -18,18 +18,23 @@ import analyzer.Engine.ItemPatternMatcher;
 import analyzer.Engine.StrPatternMatcher;
 
 public class Validator {
-	public static String dataType = "", matchType = "", matchCase = "", left_token= "", right_token="", expr_str = "", splitlistPath = "";
+	public static String dataType = "", matchType = "", matchCase = "", left_token = "", right_token = "", expr_str = "", splitlistPath = "";
 	public static HashMap<String, Data> exprfieldList = new HashMap<String, Data>();
 	List<String> splitexpr_input = new ArrayList<String>();
 	List<String> splitexpr = new ArrayList<String>();
 	List<String> expr = new ArrayList<String>();
 	MatchPropValidator mpv = new MatchPropValidator();
 	BooleanParser boolParse = new BooleanParser();
+	Boolean patternLoadRequired = false;
 
 	public Validator() throws Exception {
 		parseExpr();
-		if (!splitlistPath.isEmpty())
-			loadSplitList();
+		if (patternLoadRequired) {
+			if (splitlistPath.isEmpty())
+				throw new Exception("SplitList file is empty. Please check configuration.");
+			else
+				loadSplitList();
+		}
 	}
 
 	private void parseExpr() throws Exception {
@@ -46,7 +51,7 @@ public class Validator {
 							if (propParts.matches("and|or|not|\\(|\\)"))
 								throw new Exception(eachexpr + " boolean operators can not have matchProperty.");
 						fieldName = f_prop.remove(f_prop.size() - 1);
-						mpv.validateMP(f_prop);
+						patternLoadRequired |= mpv.validateMP(f_prop);
 						exprfieldList.put(fieldName, Data.getObject(f_prop));
 						splitexpr.add(fieldName);
 					} else if (eachexpr_norm.matches("and|or|not|\\(|\\)"))
@@ -60,6 +65,7 @@ public class Validator {
 						f_prop.add(right_token.toLowerCase());
 						fieldName = eachexpr_norm;
 						mpv.validateMP(f_prop);
+						patternLoadRequired = true;
 						exprfieldList.put(fieldName, Data.getObject(f_prop));
 						splitexpr.add(fieldName);
 					}
@@ -101,7 +107,7 @@ public class Validator {
 			boolean splitFlag = false;
 			String testField = entry.getKey();
 			Data testCondition = entry.getValue();
-			//System.out.println(testCondition);
+			// System.out.println(testCondition);
 			if (sourceDict.containsKey(testField)) {
 				if (testCondition == null)
 					splitFlag = true;

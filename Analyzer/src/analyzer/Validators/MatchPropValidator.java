@@ -5,23 +5,32 @@ import java.util.ArrayList;
 public class MatchPropValidator {
 	ArrayList<String> matchProp;
 
-	public void validateMP(ArrayList<String> matchProp_in) throws Exception {
+	public boolean validateMP(ArrayList<String> matchProp_in) throws Exception {
 		matchProp = matchProp_in;
 		if (!checkEmptyPattern()) {
 			String dataType = matchProp_in.get(0);
-			if (dataType.equalsIgnoreCase("str"))
+			if (dataType.equalsIgnoreCase("str")) {
 				str_mpValidator();
-			else if (dataType.equalsIgnoreCase("regx"))
+				return true;
+			}
+			else if (dataType.equalsIgnoreCase("regx")) {
 				str_mpValidator();
-			else if (dataType.equals("int"))
+				return true;
+			}
+			else if (dataType.equals("int")) {
 				int_mpValidator();
-			else if (dataType.equals("item"))
+				return true;
+			}
+			else if (dataType.equals("item")) {
 				item_mpValidator();
+				return false;
+			}
 			else if (dataType.matches("(?i)(coll|json|date)"))
 				throw new Exception("DataType support is not provided in the current version.");
 			else
 				throw new Exception("Invalid dataType specified.");
-		}
+		} else
+			return true;
 	}
 
 	boolean checkEmptyPattern() {
