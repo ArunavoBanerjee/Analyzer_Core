@@ -51,7 +51,7 @@ public class Analyzer {
 			Validator.right_token = prop.getProperty("rightTokenizer").strip();
 		if (prop.getProperty("splitExpression") != null)
 			Validator.expr_str = prop.getProperty("splitExpression").strip().replaceAll("\\s*:\\s*", ":");
-		else if (!Splitter.isReport && Validator.expr_str.isEmpty())
+		if (!Splitter.isReport && Validator.expr_str.isBlank())
 			throw new Exception("Split Expression is mandatory for data splitting.");
 		if (prop.getProperty("splitListFile") != null)
 			Validator.splitlistPath = prop.getProperty("splitListFile").strip();

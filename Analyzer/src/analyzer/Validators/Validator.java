@@ -52,7 +52,7 @@ public class Validator {
 					} else if (eachexpr_norm.matches("and|or|not|\\(|\\)"))
 						splitexpr.add(eachexpr_norm);
 					else {
-						ArrayList<String> f_prop = new ArrayList<String>();
+						ArrayList<String> f_prop = new ArrayList<String>(5);
 						f_prop.add(dataType.toLowerCase());
 						f_prop.add(matchType.toLowerCase());
 						f_prop.add(matchCase.toLowerCase());

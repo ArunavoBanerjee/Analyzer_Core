@@ -42,7 +42,7 @@ import analyzer.Validators.Validator;
 
 public class Splitter {
 	static String reportDest = "", dest_matched = "", dest_unmatched = "", report_matched = "", report_unmatched = "", dataReadPath = "", csvconfigPath = "",
-			matched_tarName = "", unmatched_tarName = "";
+			matched_tarPath = "", unmatched_tarPath = "";
 	ArrayList<String> matchedNameList = new ArrayList<String>();
 	ArrayList<String> unmatchedNameList = new ArrayList<String>();
 	static String[] sourceList = null;
@@ -74,13 +74,20 @@ public class Splitter {
 			FileInputStream fis = new FileInputStream(tarFile);
 			TarArchiveInputStream tis = new TarArchiveInputStream(fis);
 			TarArchiveEntry in_tarEntry = null;
-			String parentDir = "";
+			String parentDir = "", root = "", _tarEntryName = "", _path = "";
 			HashMap<String, byte[]> entryMap = new HashMap<String, byte[]>();
 			long st_time = System.currentTimeMillis();
 			while ((in_tarEntry = tis.getNextTarEntry()) != null) {
 				String tarEntryName = in_tarEntry.getName();
 				if (!tarEntryName.contains(dataReadPath))
 					continue;
+				if (root.isEmpty()) {
+					int root_idx = tarEntryName.indexOf('/');
+					if (root_idx != -1)
+						root = tarEntryName.substring(0, root_idx);
+					else
+						root = tarEntryName;
+				}
 				String parent_entry = tarEntryName.replaceAll("/$", "").replaceAll("(.*)[/\\\\].*", "$1");
 				if (in_tarEntry.isFile()) {
 					if (!parentDir.equals(parent_entry)) {
@@ -92,41 +99,53 @@ public class Splitter {
 								reportWriter.csvloader(sourceDict, writetomatch);
 							if (!isReport) {
 								for (Map.Entry<String, byte[]> dataentry : entryMap.entrySet()) {
-									TarArchiveEntry out_tarEntry = new TarArchiveEntry(dataentry.getKey());
-									out_tarEntry.setSize(dataentry.getValue().length);
 									if (writetomatch) {
 										if (!dest_matched.isEmpty()) {
 											if (batchSize != 0) {
-												String _name = dest_matched + "_batch_" + (match_count / batchSize)+".tar.gz";
-												if (!_name.equals(matched_tarName)) {
-													matched_tarName = _name;
-													matchedNameList.add(matched_tarName);
+												_path = dest_matched + "_batch_" + (match_count / batchSize) + ".tar.gz";
+												if (!_path.equals(matched_tarPath)) {
+													matched_tarPath = _path;
+													matchedNameList.add(matched_tarPath);
 													if (tos_match != null)
 														tos_match.close();
-													tos_match = get_tos(matched_tarName);
+													tos_match = get_tos(matched_tarPath);
 												}
-											} else if (!matched_tarName.equals(dest_matched)) {
-												matched_tarName = dest_matched+".tar.gz";
-												tos_match = get_tos(matched_tarName);
+											} else {
+												_path = dest_matched + ".tar.gz";
+												if (!_path.equals(matched_tarPath)) {
+													matched_tarPath = _path;
+													tos_match = get_tos(matched_tarPath);
+												}
 											}
+											_tarEntryName = dataentry.getKey();
+											_tarEntryName = _tarEntryName.replace(root, new File(matched_tarPath).getName().replace(".tar.gz", ""));
+											TarArchiveEntry out_tarEntry = new TarArchiveEntry(_tarEntryName);
+											out_tarEntry.setSize(dataentry.getValue().length);
 											tos_match.putArchiveEntry(out_tarEntry);
 											tos_match.write(dataentry.getValue());
 											tos_match.closeArchiveEntry();
 										}
 									} else if (!dest_unmatched.isEmpty()) {
 										if (batchSize != 0) {
-											String _name = dest_unmatched + "batch_" + (unmatch_count / batchSize)+".tar.gz";
-											if (!_name.equals(unmatched_tarName)) {
-												unmatched_tarName = _name;
-												unmatchedNameList.add(unmatched_tarName);
+											_path = dest_unmatched + "batch_" + (unmatch_count / batchSize) + ".tar.gz";
+											if (!_path.equals(unmatched_tarPath)) {
+												unmatched_tarPath = _path;
+												unmatchedNameList.add(unmatched_tarPath);
 												if (tos_unmatch != null)
 													tos_unmatch.close();
-												tos_unmatch = get_tos(unmatched_tarName);
+												tos_unmatch = get_tos(unmatched_tarPath);
 											}
-										} else if (!unmatched_tarName.equals(dest_unmatched)) {
-											unmatched_tarName = dest_unmatched+".tar.gz";
-											tos_unmatch = get_tos(unmatched_tarName);
+										} else {
+											_path = dest_unmatched + ".tar.gz";
+											if (!_path.equals(unmatched_tarPath)) {
+												unmatched_tarPath = _path;
+												tos_unmatch = get_tos(unmatched_tarPath);
+											}
 										}
+										_tarEntryName = dataentry.getKey();
+										_tarEntryName = _tarEntryName.replace(root, new File(unmatched_tarPath).getName().replace(".tar.gz", ""));
+										TarArchiveEntry out_tarEntry = new TarArchiveEntry(_tarEntryName);
+										out_tarEntry.setSize(dataentry.getValue().length);
 										tos_unmatch.putArchiveEntry(out_tarEntry);
 										tos_unmatch.write(dataentry.getValue());
 										tos_unmatch.closeArchiveEntry();
@@ -185,19 +204,61 @@ public class Splitter {
 					reportWriter.csvloader(sourceDict, writetomatch);
 				if (!isReport) {
 					for (Map.Entry<String, byte[]> dataentry : entryMap.entrySet()) {
-						TarArchiveEntry out_tarEntry = new TarArchiveEntry(dataentry.getKey());
-						out_tarEntry.setSize(dataentry.getValue().length);
-						if (writetomatch && tos_match != null) {
-							tos_match.putArchiveEntry(out_tarEntry);
-							tos_match.write(dataentry.getValue());
-							tos_match.closeArchiveEntry();
-						} else if (tos_unmatch != null) {
+						if (writetomatch) {
+							if (!dest_matched.isEmpty()) {
+								if (batchSize != 0) {
+									_path = dest_matched + "_batch_" + (match_count / batchSize) + ".tar.gz";
+									if (!_path.equals(matched_tarPath)) {
+										matched_tarPath = _path;
+										matchedNameList.add(matched_tarPath);
+										tos_match = get_tos(matched_tarPath);
+									}
+								} else {
+									_path = dest_matched + ".tar.gz";
+									if (!_path.equals(matched_tarPath)) {
+										matched_tarPath = _path;
+										tos_match = get_tos(matched_tarPath);
+									}
+								}
+								_tarEntryName = dataentry.getKey();
+								_tarEntryName = _tarEntryName.replace(root, new File(matched_tarPath).getName().replace(".tar.gz", ""));
+								TarArchiveEntry out_tarEntry = new TarArchiveEntry(_tarEntryName);
+								out_tarEntry.setSize(dataentry.getValue().length);
+								tos_match.putArchiveEntry(out_tarEntry);
+								tos_match.write(dataentry.getValue());
+								tos_match.closeArchiveEntry();
+							}
+						} else if (!dest_unmatched.isEmpty()) {
+							if (batchSize != 0) {
+								_path = dest_unmatched + "batch_" + (unmatch_count / batchSize) + ".tar.gz";
+								if (!_path.equals(unmatched_tarPath)) {
+									unmatched_tarPath = _path;
+									unmatchedNameList.add(unmatched_tarPath);
+									tos_unmatch = get_tos(unmatched_tarPath);
+								}
+							} else {
+								_path = dest_unmatched + ".tar.gz";
+								if (!_path.equals(unmatched_tarPath)) {
+									unmatched_tarPath = _path;
+									tos_unmatch = get_tos(unmatched_tarPath);
+								}
+							}
+							_tarEntryName = dataentry.getKey();
+							_tarEntryName = _tarEntryName.replace(root, new File(unmatched_tarPath).getName().replace(".tar.gz", ""));
+							TarArchiveEntry out_tarEntry = new TarArchiveEntry(_tarEntryName);
+							out_tarEntry.setSize(dataentry.getValue().length);
 							tos_unmatch.putArchiveEntry(out_tarEntry);
 							tos_unmatch.write(dataentry.getValue());
 							tos_unmatch.closeArchiveEntry();
 						}
 					}
 				}
+			}
+			if (!isReport) {
+				if (tos_match != null)
+					tos_match.close();
+				if (tos_unmatch != null)
+					tos_unmatch.close();
 			}
 			if (writetomatch)
 				match_count++;
@@ -227,13 +288,7 @@ public class Splitter {
 				reportWriter.csvwriter_unmatched();
 			tarFile.delete();
 		}
-		if (!isReport) {
-			if (tos_match != null)
-				tos_match.close();
-			if (tos_unmatch != null)
-				tos_unmatch.close();
-		}
-print_output();
+		print_output();
 	}
 
 	void getSourceInfo(String itemContent) throws Exception {
@@ -309,7 +364,7 @@ print_output();
 
 	TarArchiveOutputStream get_tos(String _tarName) throws Exception {
 		File _tarFile = new File(_tarName);
-		if(_tarFile.exists())
+		if (_tarFile.exists())
 			_tarFile.delete();
 		FileOutputStream fos = new FileOutputStream(_tarName);
 		GZIPOutputStream gos = new GZIPOutputStream(new BufferedOutputStream(fos));
@@ -317,27 +372,27 @@ print_output();
 		tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
 		return tos;
 	}
-	
+
 	void print_output() {
 		System.out.println("Matched #:" + match_count + "  UnMatched #:" + unmatch_count);
 		if (new_validator == null)
 			System.out.println("Report Destination: " + report_matched);
 		else {
 			if (!(dest_matched.isEmpty() || isReport)) {
-			if(batchSize == 0)
-				System.out.println("Matched Data Destination: " + matched_tarName);
-			else {
-				System.out.println("Matched Data Destination:");
-				for(String _fileLocation : matchedNameList)
-					System.out.println(_fileLocation);
-			}
+				if (batchSize == 0)
+					System.out.println("Matched Data Destination: " + matched_tarPath);
+				else {
+					System.out.println("Matched Data Destination:");
+					for (String _fileLocation : matchedNameList)
+						System.out.println(_fileLocation);
+				}
 			}
 			if (!(dest_unmatched.isEmpty() || isReport)) {
-				if(batchSize == 0)
-				System.out.println("UnMatched Data Destination: " + unmatched_tarName);
+				if (batchSize == 0)
+					System.out.println("UnMatched Data Destination: " + unmatched_tarPath);
 				else {
 					System.out.println("UnMatched Data Destination:");
-					for(String _fileLocation : unmatchedNameList)
+					for (String _fileLocation : unmatchedNameList)
 						System.out.println(_fileLocation);
 				}
 			}

@@ -4,26 +4,37 @@ import java.util.ArrayList;
 
 public class MatchPropValidator {
 	ArrayList<String> matchProp;
+
 	public void validateMP(ArrayList<String> matchProp_in) throws Exception {
 		matchProp = matchProp_in;
-		String dataType = matchProp_in.get(0);
-		if (dataType.equalsIgnoreCase("str"))
-			str_mpValidator();
-		else if (dataType.equalsIgnoreCase("regx"))
-			str_mpValidator();
-		else if (dataType.equals("int"))
-			int_mpValidator();
-		else if (dataType.equals("item"))
-			item_mpValidator();
-		else if (dataType.matches("(?i)(coll|json|date)"))
-			throw new Exception("DataType support is not provided in the current version.");
-		else
-			throw new Exception("Invalid dataType specified.");
+		if (!checkEmptyPattern()) {
+			String dataType = matchProp_in.get(0);
+			if (dataType.equalsIgnoreCase("str"))
+				str_mpValidator();
+			else if (dataType.equalsIgnoreCase("regx"))
+				str_mpValidator();
+			else if (dataType.equals("int"))
+				int_mpValidator();
+			else if (dataType.equals("item"))
+				item_mpValidator();
+			else if (dataType.matches("(?i)(coll|json|date)"))
+				throw new Exception("DataType support is not provided in the current version.");
+			else
+				throw new Exception("Invalid dataType specified.");
+		}
+	}
+
+	boolean checkEmptyPattern() {
+		for (String value : matchProp)
+			if (!value.isBlank()) {
+				return false;
+			}
+		return true;
 	}
 
 	void str_mpValidator() throws Exception {
 		if (matchProp.size() > 1 && matchProp.size() < 6) {
-			if(matchProp.get(0).equals("regx") && matchProp.get(1).equals("equals"))
+			if (matchProp.get(0).equals("regx") && matchProp.get(1).equals("equals"))
 				throw new Exception("Regx datatype can not have equals option.");
 			else if (!matchProp.get(1).matches("(?i)(startsWith|endsWith|contains|matches|equals|uniq|dupl)")) {
 				throw new Exception("matchType is not valid.");
@@ -66,7 +77,7 @@ public class MatchPropValidator {
 
 	void item_mpValidator() throws Exception {
 		if (!matchProp.get(1).matches("(?i)exists")) {
-			throw new Exception("matchType "+ matchProp.get(1) + " is not valid.\nItem datatype only supports exists condition till the current version.");
+			throw new Exception("matchType " + matchProp.get(1) + " is not valid.\nItem datatype only supports exists condition till the current version.");
 		}
 	}
 
