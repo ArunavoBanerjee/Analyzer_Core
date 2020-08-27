@@ -21,7 +21,6 @@ public class StrPatternMatcher {
 	}
 
 	public boolean str_matcher(String fieldValue, ArrayList<String> patternProp, HashSet<String> patternSet) {
-//		System.out.println(fieldValue + fieldProp[0] + fieldProp[1] + fieldProp[2] + fieldProp[3] + fieldProp[4]);
 		String case_match = patternProp.get(2).equals("no-fold") ? "(?i)" : "";
 		String left_token = "";
 		String right_token = "";

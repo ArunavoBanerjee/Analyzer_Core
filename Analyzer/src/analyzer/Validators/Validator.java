@@ -101,6 +101,7 @@ public class Validator {
 			boolean splitFlag = false;
 			String testField = entry.getKey();
 			Data testCondition = entry.getValue();
+			//System.out.println(testCondition);
 			if (sourceDict.containsKey(testField)) {
 				if (testCondition == null)
 					splitFlag = true;
@@ -131,7 +132,6 @@ public class Validator {
 
 	boolean patternMatcher(Data data, String fieldValue) {
 		for (ArrayList<String> patternClass : data.patternMap.keySet()) {
-//			System.out.println(fieldValue + Arrays.asList(srctriple));
 			String dataType = patternClass.get(0);
 			if (dataType.matches("str|regx") && StrPatternMatcher.getInstance().str_matcher(fieldValue, patternClass, data.patternMap.get(patternClass)))
 				return true;

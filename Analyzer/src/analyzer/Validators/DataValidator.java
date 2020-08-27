@@ -29,7 +29,9 @@ public class DataValidator {
 	}
 	
 	void strValidator() throws Exception {
-		if(matchProp.get(1).matches("contains|startswith|endswith"))
+		if(matchProp.get(1).equals("equals") && matchProp.get(2).equals("fold"))
+			data = data.toLowerCase();
+		else if(matchProp.get(1).matches("contains|startswith|endswith"))
 			data = data.replaceAll("([\\W&&\\S])", "\\\\$1");
 	}
 	

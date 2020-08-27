@@ -33,7 +33,6 @@ public class Data {
 	}
 
 	public void loadConstPatterns(String data) throws Exception {
-
 		patternMap.get(genericDefinition).add(data);
 	}
 
