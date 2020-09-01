@@ -38,13 +38,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import analyzer.Engine.BooleanParser;
+import analyzer.Reporting.WriteToCSV;
 import analyzer.SourceAdaptors.Parser;
 import analyzer.SourceAdaptors.SourceParserFactory;
 import analyzer.Validators.Validator;
 
 public class Splitter {
-	static String reportDest = "", dest_matched = "", dest_unmatched = "", report_matched = "", report_unmatched = "", dataReadPath = "", csvconfigPath = "",
+	static String reportDest = "", dest_matched = "", dest_unmatched = "", dataReadPath = "",
 			matched_tarPath = "", unmatched_tarPath = "";
+	public static String  csvconfigPath = "", report_unmatched = "", report_matched = "";
 	ArrayList<String> matchedNameList = new ArrayList<String>();
 	ArrayList<String> unmatchedNameList = new ArrayList<String>();
 	static String[] sourceList = null;

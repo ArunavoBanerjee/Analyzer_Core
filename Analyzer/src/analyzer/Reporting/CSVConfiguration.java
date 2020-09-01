@@ -1,4 +1,4 @@
-package analyzer;
+package analyzer.Reporting;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
+
+import analyzer.Splitter;
 
 public class CSVConfiguration {
 	int rowlimit = 0;

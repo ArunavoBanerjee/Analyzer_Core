@@ -1,4 +1,4 @@
-package analyzer;
+package analyzer.Reporting;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +16,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 import com.opencsv.CSVWriter;
 
+import analyzer.Splitter;
+
 public class WriteToCSV extends CSVConfiguration {
 	List<String> header = new ArrayList<String>();
 	List<String[]> allRows_matched = new ArrayList<String[]>();
@@ -28,7 +30,7 @@ public class WriteToCSV extends CSVConfiguration {
 	public WriteToCSV() throws Exception {
 	}
 
-	protected void csvloader(HashMap<String, HashSet<String>> sourceDict, Boolean writetomatch) throws Exception {
+	public void csvloader(HashMap<String, HashSet<String>> sourceDict, Boolean writetomatch) throws Exception {
 		String[] row;
 		if (!field_to_write.isEmpty()) {
 			if (!field_to_write.contains(ID))
@@ -77,7 +79,7 @@ public class WriteToCSV extends CSVConfiguration {
 			allRows_unmatched.add(row);
 	}
 
-	protected void csvwriter_matched() throws Exception {
+	public void csvwriter_matched() throws Exception {
 		Date writeDate = new Date("yyyy_MM_dd-HH_mm_ss");
 		Splitter.report_matched += File.separatorChar + writeDate.getDate();
 		int file_i = 0;
@@ -115,7 +117,7 @@ public class WriteToCSV extends CSVConfiguration {
 		}
 	}
 
-	protected void csvwriter_unmatched() throws Exception {
+	public void csvwriter_unmatched() throws Exception {
 		Date writeDate = new Date("yyyy_MM_dd-HH_mm_ss");
 		Splitter.report_unmatched += File.separatorChar + writeDate.getDate();
 		int file_i = 0;

@@ -1,4 +1,4 @@
-package analyzer;
+package analyzer.Reporting;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
