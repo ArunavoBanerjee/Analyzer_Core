@@ -48,9 +48,14 @@ public class WriteToCSV extends CSVConfiguration {
 			for (Map.Entry<String, HashSet<String>> entry : sourceDict.entrySet()) {
 				if (field_to_write.contains(entry.getKey())) {
 					String data = "";
-					for (String value : entry.getValue())
-						data += value + multivalue_seperator;
-					data = data.substring(0, data.length() - 1);
+					int index = entry.getValue().size();
+					for (String value : entry.getValue()) {
+						--index;
+						if(index == 0)
+							data += value;
+						else
+							data += value + multivalue_seperator;
+					}
 					row[header.indexOf(entry.getKey())] = data;
 				}
 			}
@@ -67,9 +72,14 @@ public class WriteToCSV extends CSVConfiguration {
 			row = new String[header.size()];
 			for (Map.Entry<String, HashSet<String>> entry : sourceDict.entrySet()) {
 				String data = "";
-				for (String value : entry.getValue())
-					data += value + multivalue_seperator;
-				data = data.substring(0, data.length() - 1);
+				int index = entry.getValue().size();
+				for (String value : entry.getValue()) {
+					--index;
+					if(index == 0)
+						data += value;
+					else
+						data += value + multivalue_seperator;
+				}
 				row[header.indexOf(entry.getKey())] = data;
 			}
 		}
