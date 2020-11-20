@@ -1,4 +1,4 @@
-package analyzer;
+package analyzer.Base;
 
 import java.io.FileInputStream;
 import java.io.FileReader;

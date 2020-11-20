@@ -16,7 +16,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 import com.opencsv.CSVWriter;
 
-import analyzer.Splitter;
+import analyzer.Base.Splitter;
 
 public class WriteToCSV extends CSVConfiguration {
 	List<String> header = new ArrayList<String>();

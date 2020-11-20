@@ -9,7 +9,7 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 
-import analyzer.Splitter;
+import analyzer.Base.Splitter;
 
 public class CSVConfiguration {
 	int rowlimit = 0;
@@ -20,7 +20,7 @@ public class CSVConfiguration {
 		try {
 			InputStream input = null;
 			if(Splitter.csvconfigPath.isBlank()) {
-				input = CSVConfiguration.class.getResourceAsStream("/analyzer/defaultConfig/csvconfig");
+				input = CSVConfiguration.class.getResourceAsStream("/analyzer.Base/defaultConfig/csvconfig");
 			} else {
 				input = new FileInputStream(new File(Splitter.csvconfigPath));
 			}

@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
-import analyzer.LoadData;
+import analyzer.Base.LoadData;
 import analyzer.Engine.BooleanParser;
 import analyzer.Engine.Data;
 import analyzer.Engine.ItemPatternMatcher;
