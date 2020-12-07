@@ -20,7 +20,7 @@ public class CSVConfiguration {
 		try {
 			InputStream input = null;
 			if(Splitter.csvconfigPath.isBlank()) {
-				input = CSVConfiguration.class.getResourceAsStream("/analyzer.Base/defaultConfig/csvconfig");
+				input = CSVConfiguration.class.getResourceAsStream("/analyzer/DefaultConfig/csvconfig");
 			} else {
 				input = new FileInputStream(new File(Splitter.csvconfigPath));
 			}

@@ -9,5 +9,7 @@ public abstract class Parser {
 	public HashMap<String, byte[]> entryMap = new HashMap<String, byte[]>();
 	
 	abstract public boolean next() throws Exception;
+	abstract public String getSourceName() throws Exception;
+	abstract public boolean clean() throws Exception;
 	
 }

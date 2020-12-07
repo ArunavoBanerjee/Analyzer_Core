@@ -30,6 +30,9 @@ public class ParseSIPTar extends Parser {
 	TarArchiveInputStream tis = null;
 	String dataReadPath, trimPath;
 	TarArchiveEntry in_tarEntry;
+	String tarName = "";
+	File tarFile = null;
+	HashSet<String> parentsRead = new HashSet<String>();
 
 	public ParseSIPTar(String _tarPath, String _dataReadPath) throws Exception {
 		// TODO Auto-generated constructor stub
@@ -38,10 +41,27 @@ public class ParseSIPTar extends Parser {
 		trimPath = dataReadPath.replaceAll("(\\/$)", "");
 		trimPath = trimPath.substring(0, trimPath.lastIndexOf('/') == -1 ? 0 : trimPath.lastIndexOf('/'));
 		File input_tar_gz = new File(_tarPath);
+		tarName = input_tar_gz.getName().replaceAll("\\.tar\\.gz$","");
 		String tarPath = input_tar_gz.getAbsolutePath();
-		File tarFile = deCompressGZipFile(input_tar_gz, new File(tarPath.replace(".gz", "")));
+		tarFile = deCompressGZipFile(input_tar_gz, new File(tarPath.replace(".gz", "")));
 		FileInputStream fis = new FileInputStream(tarFile);
 		tis = new TarArchiveInputStream(fis);
+//		while(tis.getNextTarEntry()!=null) {
+//		//for(int i=0;i<5;i++)
+//		if(tis.getCurrentEntry().getName().contains("/1/"))	
+//		System.out.println(tis.getCurrentEntry().getName() );
+//		}
+//		System.out.println(tis.getCurrentEntry().getName() );
+//		System.exit(0);
+	}
+	
+	public String getSourceName() {
+		return tarName;
+	}
+	
+	public boolean clean() throws Exception{
+		tis.close();
+		return tarFile.getAbsoluteFile().delete();
 	}
 
 	File deCompressGZipFile(File gZippedFile, File tarFile) throws IOException {
@@ -67,6 +87,7 @@ public class ParseSIPTar extends Parser {
 		do {
 			if(in_tarEntry != null) {
 				String tarEntryName = in_tarEntry.getName();
+				//System.out.println(dataReadPath+":" + tarEntryName);
 				if (!tarEntryName.contains(dataReadPath))
 					continue;
 				nextExists = true;
@@ -93,7 +114,7 @@ public class ParseSIPTar extends Parser {
 							ParseXMLtoDict.getSourceInfo(contentString, dataDict);
 						} else if (tarEntryName.endsWith("handle")) {
 							String handle = new String(content).strip();
-							dataDict.put("handle_ID", new HashSet<String>() {
+							dataDict.put("Handle_ID", new HashSet<String>() {
 								{
 									add(handle);
 								}
@@ -103,6 +124,7 @@ public class ParseSIPTar extends Parser {
 			}
 		}
 		while ((in_tarEntry = tis.getNextTarEntry()) != null);
+		//System.out.println(dataDict);
 		return nextExists;
 	}
 

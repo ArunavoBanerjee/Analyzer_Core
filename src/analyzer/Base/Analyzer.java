@@ -68,6 +68,9 @@ public class Analyzer {
 			Splitter.dest_unmatched = prop.getProperty("targetFileUnMatched").strip();
 		if (prop.getProperty("reportDestination") != null)
 			Splitter.reportDest = prop.getProperty("reportDestination").strip();
+		if (prop.getProperty("keepSourceHier") != null)
+			Splitter.keepsrchier = Boolean.valueOf(prop.getProperty("keepSourceHier").strip());
+		
 		
 		if (prop.getProperty("batchSize") != null) {
 			String _batchsize = prop.getProperty("batchSize").strip();

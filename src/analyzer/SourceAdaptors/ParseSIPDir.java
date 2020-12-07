@@ -31,10 +31,12 @@ import com.google.gson.JsonParser;
 
 public class ParseSIPDir extends Parser {
 	ArrayList<File> childList = new ArrayList<File>();
-
+	String sourceName = "";
 	public ParseSIPDir(String _SIPRoot) throws Exception {
 		// TODO Auto-generated constructor stub
-		traverse(new File(_SIPRoot));
+		File f_SIPRoot = new File(_SIPRoot);
+		sourceName = f_SIPRoot.getName();
+		traverse(f_SIPRoot);
 	}
 
 	public void traverse(File parent) throws Exception {
@@ -46,6 +48,14 @@ public class ParseSIPDir extends Parser {
 				return;
 			}
 		}
+	}
+	
+	public String getSourceName() {
+		return sourceName;
+	}
+	
+	public boolean clean() {
+		return true;
 	}
 
 	public boolean next() throws Exception {
