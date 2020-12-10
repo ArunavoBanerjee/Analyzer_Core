@@ -2,6 +2,8 @@ package analyzer.Engine;
 
 import java.util.ArrayList;
 
+import analyzer.PatternLoader.Data;
+
 public class ItemPatternMatcher {
 	private static volatile ItemPatternMatcher instance = null;
 

@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.util.Properties;
 import java.util.Scanner;
 
+import analyzer.Engine.Splitter;
 import analyzer.Validators.Validator;
 
 /**

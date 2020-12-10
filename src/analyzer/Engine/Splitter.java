@@ -1,4 +1,4 @@
-package analyzer.Base;
+package analyzer.Engine;
 
 import java.io.BufferedOutputStream;
 
@@ -37,24 +37,23 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import analyzer.Engine.BooleanParser;
 import analyzer.Reporting.WriteToCSV;
 import analyzer.SourceAdaptors.Parser;
 import analyzer.SourceAdaptors.SourceParserFactory;
 import analyzer.Validators.Validator;
 
 public class Splitter {
-	static String reportDest = "", dest_matched = "", dest_unmatched = "", dataReadPath = "", matched_tarPath = "", unmatched_tarPath = "";
+	public static String reportDest = "", dest_matched = "", dest_unmatched = "", dataReadPath = "", matched_tarPath = "", unmatched_tarPath = "";
 	public static String csvconfigPath = "", report_unmatched = "", report_matched = "";
 	ArrayList<String> matchedNameList = new ArrayList<String>();
 	ArrayList<String> unmatchedNameList = new ArrayList<String>();
-	static String[] sourceList = null;
-	static boolean isReport = false, dataOnly = false;
+	public static String[] sourceList = null;
+	public static boolean isReport = false, dataOnly = false;
 	public static boolean keepsrchier = false;
 	boolean writetomatch = true;
 	WriteToCSV reportWriter = null;
 	Validator new_validator = null;
-	static int batchSize = 0;
+	public static int batchSize = 0;
 	int match_count = 0, unmatch_count = 0, count_item = 0;
 	TarArchiveOutputStream tos_match = null;
 	TarArchiveOutputStream tos_unmatch = null;
@@ -63,7 +62,7 @@ public class Splitter {
 		this.new_validator = in;
 	}
 
-	protected void churnData() throws Exception {
+	public void churnData() throws Exception {
 		long st_time = System.currentTimeMillis();
 		dataReadPath = dataReadPath.replaceAll("^\\/", "");
 		String root = "", _tarEntryName = "", _path = "";

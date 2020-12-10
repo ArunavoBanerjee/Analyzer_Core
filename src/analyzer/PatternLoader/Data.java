@@ -1,4 +1,4 @@
-package analyzer.Engine;
+package analyzer.PatternLoader;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,7 +9,7 @@ import analyzer.CustomException.DataStructureException;
 public class Data {
 	private static volatile Data nullObject = null;
 	public LinkedHashMap<ArrayList<String>, HashSet<String>> patternMap = new LinkedHashMap<ArrayList<String>, HashSet<String>>();
-	HashSet<String> dupSet = new HashSet<String>();
+	public HashSet<String> dupSet = new HashSet<String>();
 	public ArrayList<String> genericDefinition;
 
 	private Data(ArrayList<String> patternproperties, Boolean emptyPattern) {

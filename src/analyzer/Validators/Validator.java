@@ -11,11 +11,11 @@ import java.util.Set;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
-import analyzer.Base.LoadData;
 import analyzer.Engine.BooleanParser;
-import analyzer.Engine.Data;
 import analyzer.Engine.ItemPatternMatcher;
 import analyzer.Engine.StrPatternMatcher;
+import analyzer.PatternLoader.Data;
+import analyzer.PatternLoader.LoadPatterns;
 
 public class Validator {
 	public static String dataType = "", matchType = "", matchCase = "", left_token = "", right_token = "", expr_str = "", splitlistPath = "";
@@ -78,7 +78,7 @@ public class Validator {
 	}
 
 	private void loadSplitList() throws Exception {
-		LoadData newLoad = new LoadData(splitlistPath);
+		LoadPatterns newLoad = new LoadPatterns(splitlistPath);
 		if (splitlistPath.endsWith(".csv"))
 			newLoad.loadDataCSV();
 		else if (splitlistPath.endsWith(".xlsx"))

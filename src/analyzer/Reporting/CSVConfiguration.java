@@ -9,7 +9,7 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 
-import analyzer.Base.Splitter;
+import analyzer.Engine.Splitter;
 
 public class CSVConfiguration {
 	int rowlimit = 0;

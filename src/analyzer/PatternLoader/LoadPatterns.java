@@ -1,4 +1,4 @@
-package analyzer.Base;
+package analyzer.PatternLoader;
 
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -21,19 +21,18 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.opencsv.CSVReader;
 import analyzer.CustomException.DataFormatException;
 import analyzer.CustomException.DataStructureException;
-import analyzer.Engine.Data;
 import analyzer.Validators.DataValidator;
 import analyzer.Validators.MatchPropValidator;
 import analyzer.Validators.Validator;
 
-public class LoadData {
+public class LoadPatterns {
 	MatchPropValidator mpv = new MatchPropValidator();
 	DataValidator dv = new DataValidator();
 	String splitDataPath;
 	String[] dataProp = new String[5];
 	String split_field, header_field;
 
-	public LoadData(String in_path) {
+	public LoadPatterns(String in_path) {
 		// TODO Auto-generated constructor stub
 		this.splitDataPath = in_path;
 	}
