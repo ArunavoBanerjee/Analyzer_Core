@@ -107,7 +107,6 @@ public class Validator {
 			boolean splitFlag = false;
 			String testField = entry.getKey();
 			Data testCondition = entry.getValue();
-			// System.out.println(testCondition);
 			if (sourceDict.containsKey(testField)) {
 				if (testCondition == null)
 					splitFlag = true;

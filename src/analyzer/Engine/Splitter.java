@@ -80,10 +80,10 @@ public class Splitter {
 				if (!dataOnly)
 					reportWriter.csvloader(parser.dataDict, writetomatch);
 				if (!isReport) {
-					// System.out.println("----" + parser.entryMap.keySet());
+//					 System.out.println("----" + parser.entryMap.keySet());
 					for (Map.Entry<String, byte[]> dataentry : parser.entryMap.entrySet()) {
-						// if(!writetomatch)
-						// System.out.println(writetomatch + "--" + dataentry.getKey());
+//						 if(!writetomatch)
+//						 System.out.println(writetomatch + "--" + dataentry.getKey());
 						if (writetomatch) {
 							if (!dest_matched.isEmpty()) {
 								if (batchSize != 0) {
@@ -136,6 +136,7 @@ public class Splitter {
 								}
 							}
 							_tarEntryName = dataentry.getKey();
+							System.out.println(_tarEntryName);
 							if (!keepsrchier) {
 								// TODO Can be replaced with a Parser variable. Needs Analysis.
 								root = _tarEntryName.substring(0, _tarEntryName.indexOf('/'));
@@ -162,14 +163,14 @@ public class Splitter {
 					float elapsed_time = (time - st_time);
 					if (elapsed_time / 60000 < 1) {
 						elapsed_time = elapsed_time / 1000;
-						System.out.println(
-								"Processed (" + new File(source).getName() + ": " + source_count + ") Total: " + count_item + " records in " + Math.round(elapsed_time * 100) / 100 + " seconds.");
+						System.out.println("Processed (" + new File(source).getName() + ": " + source_count + ") Total: " + count_item + " records in "
+								+ Math.round(elapsed_time * 100) / 100 + " seconds.");
 					} else {
 						elapsed_time = elapsed_time / 1000;
 						float elapsed_min = elapsed_time / 60;
 						float elapsed_sec = elapsed_time % 60;
-						System.out.println("Processed (" + new File(source).getName() + ": " + source_count + ") Total: " + count_item + " records in " + Math.round(elapsed_min * 100) / 100
-								+ " mins " + Math.round(elapsed_sec * 100) / 100 + " seconds.");
+						System.out.println("Processed (" + new File(source).getName() + ": " + source_count + ") Total: " + count_item + " records in "
+								+ Math.round(elapsed_min * 100) / 100 + " mins " + Math.round(elapsed_sec * 100) / 100 + " seconds.");
 					}
 				}
 			}
@@ -178,14 +179,14 @@ public class Splitter {
 				float elapsed_time = (time - st_time);
 				if (elapsed_time / 60000 < 1) {
 					elapsed_time = elapsed_time / 1000;
-					System.out.println(
-							"Processed (" + new File(source).getName() + ": " + source_count + ") Total: " + count_item + " records in " + Math.round(elapsed_time * 100) / 100 + " seconds.");
+					System.out.println("Processed (" + new File(source).getName() + ": " + source_count + ") Total: " + count_item + " records in "
+							+ Math.round(elapsed_time * 100) / 100 + " seconds.");
 				} else {
 					elapsed_time = elapsed_time / 1000;
 					float elapsed_min = elapsed_time / 60;
 					float elapsed_sec = elapsed_time % 60;
-					System.out.println("Processed (" + new File(source).getName() + ": " + source_count + ") Total: " + count_item + " records in " + Math.round(elapsed_min * 100) / 100
-							+ " mins " + Math.round(elapsed_sec * 100) / 100 + " seconds.");
+					System.out.println("Processed (" + new File(source).getName() + ": " + source_count + ") Total: " + count_item + " records in "
+							+ Math.round(elapsed_min * 100) / 100 + " mins " + Math.round(elapsed_sec * 100) / 100 + " seconds.");
 				}
 			}
 			parser.clean();
@@ -220,21 +221,30 @@ public class Splitter {
 			System.out.println("Report Destination: " + report_matched);
 		else {
 			if (!(dest_matched.isEmpty() || isReport)) {
-				if (batchSize == 0)
-					System.out.println("Matched Data Destination: " + matched_tarPath);
+				if (matched_tarPath.isBlank() && matchedNameList.isEmpty())
+					System.out.println("UnMatched Data Destination: No Unmatched File generated.");
 				else {
-					System.out.println("Matched Data Destination:");
-					for (String _fileLocation : matchedNameList)
-						System.out.println(_fileLocation);
+					if (batchSize == 0)
+						System.out.println("Matched Data Destination: " + matched_tarPath);
+					else {
+						System.out.println("Matched Data Destination:");
+						for (String _fileLocation : matchedNameList)
+							System.out.println(_fileLocation);
+					}
 				}
+
 			}
 			if (!(dest_unmatched.isEmpty() || isReport)) {
-				if (batchSize == 0)
-					System.out.println("UnMatched Data Destination: " + unmatched_tarPath);
+				if (unmatched_tarPath.isBlank() && unmatchedNameList.isEmpty())
+					System.out.println("UnMatched Data Destination: No Unmatched file generated.");
 				else {
-					System.out.println("UnMatched Data Destination:");
-					for (String _fileLocation : unmatchedNameList)
-						System.out.println(_fileLocation);
+					if (batchSize == 0)
+						System.out.println("UnMatched Data Destination: " + unmatched_tarPath);
+					else {
+						System.out.println("UnMatched Data Destination:");
+						for (String _fileLocation : unmatchedNameList)
+							System.out.println(_fileLocation);
+					}
 				}
 			}
 			if (!report_matched.isEmpty())

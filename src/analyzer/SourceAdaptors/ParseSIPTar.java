@@ -87,8 +87,8 @@ public class ParseSIPTar extends Parser {
 		do {
 			if(in_tarEntry != null) {
 				String tarEntryName = in_tarEntry.getName();
-				//System.out.println(dataReadPath+":" + tarEntryName);
-				if (!tarEntryName.contains(dataReadPath))
+//				System.out.println(dataReadPath+":" + tarEntryName);
+				if (!(tarEntryName.contains(dataReadPath) && in_tarEntry.isFile()))
 					continue;
 				nextExists = true;
 				if (root.isEmpty()) {
