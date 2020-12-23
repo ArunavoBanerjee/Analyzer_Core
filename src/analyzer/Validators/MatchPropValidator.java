@@ -1,7 +1,11 @@
 package analyzer.Validators;
 
 import java.util.ArrayList;
-
+/**
+ * Module to validate matchProperty construct.
+ * @author banerjee.arunavo.cse16@gmail.com
+ *
+ */
 public class MatchPropValidator {
 	ArrayList<String> matchProp;
 

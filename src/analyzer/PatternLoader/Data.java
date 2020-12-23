@@ -18,7 +18,11 @@ public class Data {
 			this.patternMap.put(patternproperties, new HashSet<String>());
 		}
 	}
-
+/**
+ * Method to call the instance of data properties.
+ * @param patternproperties
+ * @return
+ */
 	public static Data getObject(ArrayList<String> patternproperties) {
 		Boolean emptyPattern = true;
 		for (String value : patternproperties)

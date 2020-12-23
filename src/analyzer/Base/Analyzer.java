@@ -7,7 +7,6 @@ import java.io.PrintStream;
 import java.util.Properties;
 import java.util.Scanner;
 
-import analyzer.Engine.Splitter;
 import analyzer.Validators.Validator;
 
 /**
@@ -51,7 +50,7 @@ public class Analyzer {
 		if (prop.getProperty("rightTokenizer") != null)
 			Validator.right_token = prop.getProperty("rightTokenizer").strip();
 		if (prop.getProperty("splitExpression") != null)
-			Validator.expr_str = prop.getProperty("splitExpression").strip().replaceAll("\\s*:\\s*", ":");
+			Validator.expr_str = prop.getProperty("splitExpression").strip().replaceAll("\\s*:\\s*", ":").replaceAll("\\s+", " ");
 		if (!Splitter.isReport && Validator.expr_str.isBlank())
 			throw new Exception("Split Expression is mandatory for data splitting.");
 		if (prop.getProperty("splitListFile") != null)

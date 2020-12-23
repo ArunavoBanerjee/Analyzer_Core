@@ -17,6 +17,15 @@ import analyzer.Engine.StrPatternMatcher;
 import analyzer.PatternLoader.Data;
 import analyzer.PatternLoader.LoadPatterns;
 
+/**
+ * The operation done in Validator class is to validate if the split-expression follows the matchProperty construct. The construct of
+ * MatchProperty is to have the components separated by the token ":" and in the order dataType:condition:case_info:fieldName. Components
+ * can be mandatory or optional depending on the design specification.
+ * 
+ * @author banerjee.arunavo.cse16@gmail.com
+ * @see <a href="https://docs.google.com/document/d/1Xqhd1NWnlNVF2UZJT8LKMb5gKaaRa_hnMvktb_kBpLg/edit?usp=sharing">Analyzer-How-To</a>
+ *
+ */
 public class Validator {
 	public static String dataType = "", matchType = "", matchCase = "", left_token = "", right_token = "", expr_str = "", splitlistPath = "";
 	public static HashMap<String, Data> exprfieldList = new HashMap<String, Data>();
@@ -37,38 +46,45 @@ public class Validator {
 		}
 	}
 
+	/**
+	 * Parsing and validating split expression. The method parse the text form of the split-expression and segments it to matchProperty
+	 * structure. Each segments are then passed through the validation method {@link analyzer.Validators.MatchPropValidator#validateMP}.
+	 * 
+	 * @throws Exception if the expression is invalid as per matchProperty construct.
+	 * @see MatchPropValidator
+	 */
 	private void parseExpr() throws Exception {
-		splitexpr_input = Arrays.asList(expr_str.split("\\s"));
+		splitexpr_input = Arrays.asList(expr_str.split("\\s+")); // splitting text expression to processing segments.
 		for (String eachexpr : splitexpr_input) {
-			eachexpr = eachexpr.replaceAll("\\(", " ( ").replaceAll("\\)", " ) ").replaceAll("\\s+", " ");
-			for (String eachexpr_norm : eachexpr.split("\\s")) {
-				eachexpr_norm = eachexpr_norm.strip();
-				if (!eachexpr_norm.isEmpty()) {
-					String fieldName = "";
-					if (eachexpr_norm.contains(":")) {
-						ArrayList<String> f_prop = new ArrayList(Arrays.asList(eachexpr_norm.split(":")));
-						for (String propParts : f_prop)
-							if (propParts.matches("and|or|not|\\(|\\)"))
-								throw new Exception(eachexpr + " boolean operators can not have matchProperty.");
-						fieldName = f_prop.remove(f_prop.size() - 1);
-						patternLoadRequired |= mpv.validateMP(f_prop);
-						exprfieldList.put(fieldName, Data.getObject(f_prop));
-						splitexpr.add(fieldName);
-					} else if (eachexpr_norm.matches("and|or|not|\\(|\\)"))
-						splitexpr.add(eachexpr_norm);
-					else {
-						ArrayList<String> f_prop = new ArrayList<String>(5);
-						f_prop.add(dataType.toLowerCase());
-						f_prop.add(matchType.toLowerCase());
-						f_prop.add(matchCase.toLowerCase());
-						f_prop.add(left_token.toLowerCase());
-						f_prop.add(right_token.toLowerCase());
-						fieldName = eachexpr_norm;
-						mpv.validateMP(f_prop);
-						patternLoadRequired = true;
-						exprfieldList.put(fieldName, Data.getObject(f_prop));
-						splitexpr.add(fieldName);
-					}
+			eachexpr = eachexpr.replaceAll("\\(", " ( ").replaceAll("\\)", " ) ");
+			for (String eachexpr_norm : eachexpr.split("\\s")) { // TODO test eachexpr_norm for various indentations.
+				String fieldName = "";
+				if (eachexpr_norm.contains(":")) {
+					ArrayList<String> f_prop = new ArrayList(Arrays.asList(eachexpr_norm.split(":")));
+					for (String propParts : f_prop)
+						if (propParts.matches("and|or|not|\\(|\\)"))
+							throw new Exception(eachexpr + " boolean operators can not have matchProperty.");
+					fieldName = f_prop.remove(f_prop.size() - 1); // fieldName is not required for matchProperty validation
+					// matchProperty construct validation. {datatype:condition<optional>:case_info<optional>}. Throws java.lang.Exception if not validated. Else
+					// returns boolean result if the validation condition requires external data loading.
+					patternLoadRequired |= mpv.validateMP(f_prop);
+					// TODO One of the most important step. Validate in details.
+					exprfieldList.put(fieldName, Data.getObject(f_prop)); 
+					splitexpr.add(fieldName);
+				} else if (eachexpr_norm.matches("and|or|not|\\(|\\)"))
+					splitexpr.add(eachexpr_norm);
+				else {
+					ArrayList<String> f_prop = new ArrayList<String>(5);
+					f_prop.add(dataType.toLowerCase());
+					f_prop.add(matchType.toLowerCase());
+					f_prop.add(matchCase.toLowerCase());
+					f_prop.add(left_token.toLowerCase());
+					f_prop.add(right_token.toLowerCase());
+					fieldName = eachexpr_norm;
+					mpv.validateMP(f_prop);
+					patternLoadRequired = true;
+					exprfieldList.put(fieldName, Data.getObject(f_prop));
+					splitexpr.add(fieldName);
 				}
 			}
 		}
