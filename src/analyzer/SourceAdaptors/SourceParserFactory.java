@@ -9,6 +9,8 @@ public class SourceParserFactory {
 			return new ParseSIPTar(sourcePath, dataReadPath);
 		else if (new File(sourcePath).isDirectory())
 			return new ParseSIPDir(sourcePath);
+		else if (sourcePath.endsWith(".csv"))
+			return new ParseSIPCSV(sourcePath);
 		else
 			return null;
 			

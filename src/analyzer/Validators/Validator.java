@@ -69,7 +69,7 @@ public class Validator {
 					// returns boolean result if the validation condition requires external data loading.
 					patternLoadRequired |= mpv.validateMP(f_prop);
 					// TODO One of the most important step. Validate in details.
-					exprfieldList.put(fieldName, Data.getObject(f_prop)); 
+					exprfieldList.put(fieldName, Data.getObject(f_prop));
 					splitexpr.add(fieldName);
 				} else if (eachexpr_norm.matches("and|or|not|\\(|\\)"))
 					splitexpr.add(eachexpr_norm);
