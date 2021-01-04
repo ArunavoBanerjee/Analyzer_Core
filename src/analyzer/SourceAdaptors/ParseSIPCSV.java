@@ -57,7 +57,9 @@ public class ParseSIPCSV extends Parser {
 	public boolean next() throws Exception {
 		dataDict.clear();
 		entryMap.clear();
+		boolean nextExists = false;
 		while(cr.readNext() != null) {
+			nextExists = true;
 			if(in_tarEntry != null) {
 				String tarEntryName = in_tarEntry.getName();
 //				System.out.println(dataReadPath+":" + tarEntryName);
