@@ -58,48 +58,27 @@ public class ParseSIPCSV extends Parser {
 		dataDict.clear();
 		entryMap.clear();
 		boolean nextExists = false;
-		while(cr.readNext() != null) {
+		String [] row = null;
+		while((row = cr.readNext()) != null) {
 			nextExists = true;
-			if(in_tarEntry != null) {
-				String tarEntryName = in_tarEntry.getName();
-//				System.out.println(dataReadPath+":" + tarEntryName);
-				if (!(tarEntryName.contains(dataReadPath) && in_tarEntry.isFile()))
+			for(int i = 0; i < row.length; i++) {
+				if(row[i].isBlank())
 					continue;
-				nextExists = true;
-				if (root.isEmpty()) {
-					int root_idx = tarEntryName.indexOf('/');
-					if (root_idx != -1)
-						root = tarEntryName.substring(0, root_idx);
-					else
-						root = tarEntryName;
-				}
-				String parent_entry = tarEntryName.replaceAll("/$", "").replaceAll("(.*)[/\\\\].*", "$1");
-				if(parentDir.isBlank())
-					parentDir = parent_entry;
-				if (in_tarEntry.isFile()) {
-					if (!parentDir.equals(parent_entry))
-						break;
-						byte[] content = new byte[(int) in_tarEntry.getSize()];
-						int offset = 0;
-						tis.read(content, offset, content.length - offset);
-						tarEntryName = tarEntryName.replace(trimPath, "");
-						entryMap.put(tarEntryName, content);
-						if (tarEntryName.endsWith(".xml")) {
-							String contentString = new String(content);
-							ParseXMLtoDict.getSourceInfo(contentString, dataDict);
-						} else if (tarEntryName.endsWith("handle")) {
-							String handle = new String(content).strip();
-							dataDict.put("Handle_ID", new HashSet<String>() {
-								{
-									add(handle);
-								}
-							});
-						}
+				String field_name = header[i].strip();
+				if(!dataDict.containsKey(field_name)) {
+					HashSet<String> values = new HashSet<String>();
+					for(String eachValue : row[i].strip().split(";"))
+						values.add(eachValue);
+					dataDict.put(field_name,values);
+				} else {
+					for(String eachValue : row[i].strip().split(";"))
+						dataDict.get(field_name).add(eachValue);
 				}
 			}
 		}
-		while ((in_tarEntry = tis.getNextTarEntry()) != null);
 		//System.out.println(dataDict);
 		return nextExists;
 	}
+	
+	
 }

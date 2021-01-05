@@ -72,7 +72,7 @@ public class Splitter {
 		SourceParserFactory factory = new SourceParserFactory();
 		for (String source : sourceList) {
 			int source_count = 0;
-			Parser parser = factory.getParser(source, "");
+			Parser parser = factory.getParser(source, dataReadPath);
 			while (parser.next()) {
 				writetomatch = true;
 				if (new_validator != null)
@@ -222,7 +222,7 @@ public class Splitter {
 		else {
 			if (!(dest_matched.isEmpty() || isReport)) {
 				if (matched_tarPath.isBlank() && matchedNameList.isEmpty())
-					System.out.println("UnMatched Data Destination: No Unmatched File generated.");
+					System.out.println("Matched Data Destination: No Matched File generated.");
 				else {
 					if (batchSize == 0)
 						System.out.println("Matched Data Destination: " + matched_tarPath);
