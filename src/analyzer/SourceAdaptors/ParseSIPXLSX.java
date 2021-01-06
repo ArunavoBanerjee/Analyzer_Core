@@ -29,12 +29,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.opencsv.CSVReader;
 
-public class ParseSIPCSV extends Parser {
+/**
+ * XLSX input data parser. WIP
+ * @author ndl
+ *
+ */
+
+public class ParseSIPXLSX extends Parser {
 
 	String _csvName = "";
 	String[] header = null;
 	CSVReader cr = null;
-	public ParseSIPCSV(String _csvPath) throws Exception {
+	public ParseSIPXLSX(String _csvPath) throws Exception {
 		// TODO Auto-generated constructor stub
 		File _csvFile = new File(_csvPath);
 		_csvName = _csvFile.getName();

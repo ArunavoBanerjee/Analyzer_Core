@@ -71,7 +71,7 @@ public class Analyzer {
 		if (prop.getProperty("keepSourceHier") != null)
 			Splitter.keepsrchier = Boolean.valueOf(prop.getProperty("keepSourceHier").strip());
 		
-		
+
 		if (prop.getProperty("batchSize") != null) {
 			String _batchsize = prop.getProperty("batchSize").strip();
 			if (!_batchsize.isEmpty()) {
