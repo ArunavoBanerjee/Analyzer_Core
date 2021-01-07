@@ -58,7 +58,7 @@ public class ParseSIPCSV extends Parser {
 		dataDict.clear();
 		boolean nextExists = false;
 		String [] row = null;
-		while((row = cr.readNext()) != null) {
+		if((row = cr.readNext()) != null) {
 			nextExists = true;
 			for(int i = 0; i < row.length; i++) {
 				if(row[i].isBlank())
