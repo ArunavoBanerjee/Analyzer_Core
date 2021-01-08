@@ -16,6 +16,7 @@ import analyzer.Validators.Validator;
  *
  */
 public class Analyzer {
+
 	static Scanner in = new Scanner(System.in);
 
 	public static void main(String[] args) throws Exception {
@@ -50,7 +51,8 @@ public class Analyzer {
 		if (prop.getProperty("rightTokenizer") != null)
 			Validator.right_token = prop.getProperty("rightTokenizer").strip();
 		if (prop.getProperty("splitExpression") != null)
-			Validator.expr_str = prop.getProperty("splitExpression").strip().replaceAll("\\s*:\\s*", ":").replaceAll("\\s+", " ");
+			Validator.expr_str = prop.getProperty("splitExpression").strip().replaceAll("\\s*:\\s*", ":")
+					.replaceAll("\\s+", " ");
 		if (!Splitter.isReport && Validator.expr_str.isBlank())
 			throw new Exception("Split Expression is mandatory for data splitting.");
 		if (prop.getProperty("splitListFile") != null)
@@ -70,7 +72,6 @@ public class Analyzer {
 			Splitter.reportDest = prop.getProperty("reportDestination").strip();
 		if (prop.getProperty("keepSourceHier") != null)
 			Splitter.keepsrchier = Boolean.valueOf(prop.getProperty("keepSourceHier").strip());
-		
 
 		if (prop.getProperty("batchSize") != null) {
 			String _batchsize = prop.getProperty("batchSize").strip();
@@ -103,7 +104,8 @@ public class Analyzer {
 			elapsed_time = elapsed_time / 1000;
 			float elapsed_min = elapsed_time / 60;
 			float elapsed_sec = elapsed_time % 60;
-			System.out.println("Total Processing Time " + Math.round(elapsed_min) + " mins " + Math.round(elapsed_sec * 100) / 100 + " seconds.");
+			System.out.println("Total Processing Time " + Math.round(elapsed_min) + " mins "
+					+ Math.round(elapsed_sec * 100) / 100 + " seconds.");
 		}
 	}
 
@@ -122,7 +124,8 @@ public class Analyzer {
 				if (!Splitter.reportDest.isEmpty())
 					Splitter.report_matched = Splitter.reportDest + File.separatorChar + "data-report";
 				else
-					throw new Exception("Data report need to have mandatory reportDestination value in properties file.");
+					throw new Exception(
+							"Default Data report need to have mandatory reportDestination parameter value in properties file.\nOther destination parameter values are not considered.");
 			} else if (!(Splitter.dest_matched.isBlank() && Splitter.dest_unmatched.isBlank())) {
 				if (Splitter.dest_matched.endsWith("tar.gz"))
 					Splitter.report_matched = Splitter.dest_matched.replace(".tar.gz", "") + "_report";
@@ -152,7 +155,8 @@ public class Analyzer {
 							Splitter.report_unmatched = Splitter.dest_unmatched.replace(".tar.gz", "") + "_report";
 					} else if (reportFlag.equalsIgnoreCase("no")) {
 						if (Splitter.reportDest.isEmpty()) {
-							System.out.println("Report Destination not provided. No report will be generated. Continue? (Yes/No)");
+							System.out.println(
+									"Report Destination not provided. No report will be generated. Continue? (Yes/No)");
 							reportFlag = in.next();
 							if (reportFlag.equalsIgnoreCase("yes")) {
 								Splitter.dataOnly = true;
@@ -164,8 +168,10 @@ public class Analyzer {
 								throw new Exception("Invalid entry : '" + reportFlag + "'");
 							}
 						} else {
-							Splitter.report_matched = Splitter.reportDest + File.separatorChar + "Analyzer_matched-report";
-							Splitter.report_unmatched = Splitter.reportDest + File.separatorChar + "Analyzer_unmatched-report";
+							Splitter.report_matched = Splitter.reportDest + File.separatorChar
+									+ "Analyzer_matched-report";
+							Splitter.report_unmatched = Splitter.reportDest + File.separatorChar
+									+ "Analyzer_unmatched-report";
 						}
 					} else if (reportFlag.equalsIgnoreCase("no")) {
 						Splitter.dataOnly = true;
