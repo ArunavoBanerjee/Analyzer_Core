@@ -31,13 +31,14 @@ import com.opencsv.CSVReader;
 
 public class ParseSIPCSV extends Parser {
 
-	String _csvName = "";
+	String _csvName = "", multiValueSep = "";
 	String[] header = null;
 	CSVReader cr = null;
-	public ParseSIPCSV(String _csvPath) throws Exception {
+	public ParseSIPCSV(String _csvPath, String multiValueSep) throws Exception {
 		// TODO Auto-generated constructor stub
 		File _csvFile = new File(_csvPath);
 		_csvName = _csvFile.getName();
+		this.multiValueSep = multiValueSep;
 		cr = new CSVReader(new FileReader(_csvFile));
 		header = cr.readNext();
 //		if(!testforheader(header))
@@ -66,12 +67,20 @@ public class ParseSIPCSV extends Parser {
 				String field_name = header[i].strip();
 				if(!dataDict.containsKey(field_name)) {
 					HashSet<String> values = new HashSet<String>();
-					for(String eachValue : row[i].strip().split(";"))
+					if(multiValueSep.isBlank()) {
+						values.add(row[i].strip());
+					} else {
+					for(String eachValue : row[i].strip().split(multiValueSep))
 						values.add(eachValue);
+					}
 					dataDict.put(field_name,values);
 				} else {
-					for(String eachValue : row[i].strip().split(";"))
+					if(multiValueSep.isBlank()) {
+						dataDict.get(field_name).add(row[i].strip());
+					} else {
+					for(String eachValue : row[i].strip().split(multiValueSep))
 						dataDict.get(field_name).add(eachValue);
+					}
 				}
 			}
 		}

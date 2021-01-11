@@ -62,6 +62,7 @@ public class Analyzer {
 		}
 
 		Splitter.sourceList = prop.getProperty("sourceFile").split(",");
+		Splitter.csvMultivalueSep = prop.getProperty("csvMultivalueSep","").strip();
 		if (prop.getProperty("targetFileMatched") != null)
 			Splitter.dest_matched = prop.getProperty("targetFileMatched").strip();
 		if (prop.getProperty("targetFileUnMatched") != null)

@@ -89,7 +89,10 @@ public class WriteToCSV extends CSVConfiguration {
 			allRows_unmatched.add(row);
 	}
 
-	public void csvwriter_matched() throws Exception {
+	public boolean csvwriter_matched() throws Exception {
+		if(allRows_matched.size() == 0)
+			return false;
+		else {
 		Date writeDate = new Date("yyyy_MM_dd-HH_mm_ss");
 		Splitter.report_matched += File.separatorChar + writeDate.getDate();
 		int file_i = 0;
@@ -125,9 +128,14 @@ public class WriteToCSV extends CSVConfiguration {
 			filerows.clear();
 			cwriter.close();
 		}
+		return true;
+		}
 	}
 
-	public void csvwriter_unmatched() throws Exception {
+	public boolean csvwriter_unmatched() throws Exception {
+		if(allRows_unmatched.size() == 0)
+			return false;
+		else {
 		Date writeDate = new Date("yyyy_MM_dd-HH_mm_ss");
 		Splitter.report_unmatched += File.separatorChar + writeDate.getDate();
 		int file_i = 0;
@@ -162,6 +170,8 @@ public class WriteToCSV extends CSVConfiguration {
 			cwriter.writeAll(filerows);
 			filerows.clear();
 			cwriter.close();
+		}
+		return true;
 		}
 	}
 }

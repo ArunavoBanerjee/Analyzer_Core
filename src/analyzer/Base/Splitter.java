@@ -44,12 +44,11 @@ import analyzer.Validators.Validator;
 
 public class Splitter {
 	public static String reportDest = "", dest_matched = "", dest_unmatched = "", dataReadPath = "", matched_tarPath = "", unmatched_tarPath = "";
-	public static String csvconfigPath = "", report_unmatched = "", report_matched = "";
+	public static String csvconfigPath = "", report_unmatched = "", report_matched = "", csvMultivalueSep = "";
 	ArrayList<String> matchedNameList = new ArrayList<String>();
 	ArrayList<String> unmatchedNameList = new ArrayList<String>();
 	public static String[] sourceList = null;
-	public static boolean isReport = false, dataOnly = false;
-	public static boolean keepsrchier = false;
+	public static boolean isReport = false, dataOnly = false, keepsrchier = false, matchSet = false, unmatchSet = false;
 	boolean writetomatch = true;
 	WriteToCSV reportWriter = null;
 	Validator new_validator = null;
@@ -70,7 +69,11 @@ public class Splitter {
 		dest_matched = dest_matched.replaceAll("\\.tar\\.gz$", "");
 		dest_unmatched = dest_unmatched.replaceAll("\\.tar\\.gz$", "");
 		SourceParserFactory factory = new SourceParserFactory();
+		factory.csvMultivalueSep = csvMultivalueSep;
 		for (String source : sourceList) {
+			source = source.strip();
+			if(source.isEmpty())
+				continue;
 			int source_count = 0;
 			Parser parser = factory.getParser(source, dataReadPath);
 			while (parser.next()) {
@@ -198,9 +201,9 @@ public class Splitter {
 				tos_unmatch.close();
 		}
 		if (!report_matched.isEmpty())
-			reportWriter.csvwriter_matched();
+			matchSet = reportWriter.csvwriter_matched();
 		if (!report_unmatched.isEmpty())
-			reportWriter.csvwriter_unmatched();
+			unmatchSet = reportWriter.csvwriter_unmatched();
 		print_output();
 	}
 
@@ -232,7 +235,6 @@ public class Splitter {
 							System.out.println(_fileLocation);
 					}
 				}
-
 			}
 			if (!(dest_unmatched.isEmpty() || isReport)) {
 				if (unmatched_tarPath.isBlank() && unmatchedNameList.isEmpty())
@@ -247,10 +249,14 @@ public class Splitter {
 					}
 				}
 			}
-			if (!report_matched.isEmpty())
+			if (!report_matched.isEmpty() && matchSet)
 				System.out.println("Matched Report Destination: " + report_matched);
-			if (!report_unmatched.isEmpty())
+			else
+				System.out.println("Matched Report Destination: No Matched report generated.");
+			if (!report_unmatched.isEmpty() && unmatchSet)
 				System.out.println("UnMatched Report Destination: " + report_unmatched);
+			else
+				System.out.println("UnMatched Report Destination: No UnMatched report generated.");
 		}
 	}
 
