@@ -34,6 +34,7 @@ public class ParseSIPCSV extends Parser {
 	String _csvName = "", multiValueSep = "";
 	String[] header = null;
 	CSVReader cr = null;
+	JsonParser parser = new JsonParser();
 	public ParseSIPCSV(String _csvPath, String multiValueSep) throws Exception {
 		// TODO Auto-generated constructor stub
 		File _csvFile = new File(_csvPath);
@@ -88,5 +89,14 @@ public class ParseSIPCSV extends Parser {
 		return nextExists;
 	}
 	
-	
+	HashMap<String,String> deepKVPextract(String field, String value) {
+		HashMap<String, String> deepKVP = new HashMap<String, String>();
+		JsonObject jsonObject = parser.parse(value).getAsJsonObject();
+		for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+			String extendedField = field + "@" + entry.getKey();
+			String textContent = entry.getValue().getAsString();
+			deepKVP.put(extendedField, textContent);
+		}
+		return deepKVP;
+	}
 }
