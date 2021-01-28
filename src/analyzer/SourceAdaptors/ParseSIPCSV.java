@@ -106,11 +106,16 @@ public class ParseSIPCSV extends Parser {
 
 	HashMap<String, String> deepKVPextract(String field, String value) {
 		deepKVP.clear();
+		//System.out.println(value);
+		try {
 		JsonObject jsonObject = parser.parse(value).getAsJsonObject();
 		for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
 			String extendedField = field + "@" + entry.getKey();
 			String textContent = entry.getValue().getAsString();
 			deepKVP.put(extendedField, textContent);
+		}
+		} catch (Exception e) {
+			
 		}
 		return deepKVP;
 	}
