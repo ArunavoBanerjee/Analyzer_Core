@@ -66,9 +66,17 @@ public class ParseSIPCSV extends Parser {
 			for (int i = 0; i < row.length; i++) {
 				if (row[i].isBlank())
 					continue;
+				//System.out.println(row[i]);
 				String field_name = header[i].strip();
-				String field_value = row[i].strip();
-				deepKVPextract(field_name, field_value);
+				HashSet<String> field_value_list = new HashSet<String>();
+				if(multiValueSep.isBlank())
+					field_value_list.add(row[i].strip());
+				else
+					for (String eachValue : row[i].strip().split(multiValueSep))
+						field_value_list.add(eachValue);
+				
+				for(String field_value : field_value_list){
+					deepKVPextract(field_name, field_value);
 				if (!deepKVP.isEmpty()) {
 					for(Map.Entry<String, String> entry : deepKVP.entrySet()) {
 						if (!dataDict.containsKey(entry.getKey())) {
@@ -82,22 +90,13 @@ public class ParseSIPCSV extends Parser {
 				} else {
 					if (!dataDict.containsKey(field_name)) {
 						HashSet<String> values = new HashSet<String>();
-						if (multiValueSep.isBlank()) {
-							values.add(row[i].strip());
-						} else {
-							for (String eachValue : row[i].strip().split(multiValueSep))
-								values.add(eachValue);
-						}
+						values.add(field_value);
 						dataDict.put(field_name, values);
 					} else {
-						if (multiValueSep.isBlank()) {
-							dataDict.get(field_name).add(row[i].strip());
-						} else {
-							for (String eachValue : row[i].strip().split(multiValueSep))
-								dataDict.get(field_name).add(eachValue);
-						}
+						dataDict.get(field_name).add(field_value);
 					}
 				}
+			}
 			}
 		}
 		// System.out.println(dataDict);
