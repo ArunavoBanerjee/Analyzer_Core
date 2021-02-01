@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -83,6 +84,11 @@ public class ParseSIPXLSX extends Parser {
 		}
 		//System.out.println(dataDict);
 		return nextExists;
+	}
+	
+	public ArrayList<String> loadKeys() throws Exception {
+		ArrayList<String> keyMaster = new ArrayList<String>();
+		return keyMaster;
 	}
 	
 	

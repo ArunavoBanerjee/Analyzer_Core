@@ -43,6 +43,7 @@ public class Splitter {
 	public static String csvconfigPath = "", report_unmatched = "", report_matched = "", csvMultivalueSep = "";
 	ArrayList<String> matchedNameList = new ArrayList<String>();
 	ArrayList<String> unmatchedNameList = new ArrayList<String>();
+	ArrayList<String> keyMaster = new ArrayList<String>();
 	public static String[] sourceList = null;
 	public static boolean isReport = false, dataOnly = false, keepsrchier = false, matchSet = false, unmatchSet = false;
 	boolean writetomatch = true;
@@ -68,7 +69,9 @@ public class Splitter {
 		factory.csvMultivalueSep = csvMultivalueSep;
 		for(String source : sourceList) {
 			Parser parser = factory.getParser(source, dataReadPath);
-			parser.loadKeys();
+			for(String key : parser.loadKeys())
+				if(!keyMaster.contains(key))
+					keyMaster.add(key);
 		}
 			
 		for (String source : sourceList) {
