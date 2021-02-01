@@ -33,10 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import analyzer.Reporting.WriteToCSV;
 import analyzer.SourceAdaptors.Parser;
 import analyzer.SourceAdaptors.SourceParserFactory;
@@ -70,6 +66,11 @@ public class Splitter {
 		dest_unmatched = dest_unmatched.replaceAll("\\.tar\\.gz$", "");
 		SourceParserFactory factory = new SourceParserFactory();
 		factory.csvMultivalueSep = csvMultivalueSep;
+		for(String source : sourceList) {
+			Parser parser = factory.getParser(source, dataReadPath);
+			parser.loadKeys();
+		}
+			
 		for (String source : sourceList) {
 			source = source.strip();
 			if(source.isEmpty())

@@ -6,23 +6,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -56,6 +44,30 @@ public class ParseSIPCSV extends Parser {
 		cr.close();
 		return true;
 	}
+	
+	public boolean loadKeys() {
+		String[] row = null;
+		ArrayList<String> keyMaster = new ArrayList<String>();
+		while ((row = cr.readNext()) != null) {
+			for (int i = 0; i < row.length; i++) {
+				if(row[i].isBlank())
+					continue;
+				String field_name = header[i].strip();
+				keyMaster.add(field_name);
+				HashSet<String> field_value_list = new HashSet<String>();
+				if(multiValueSep.isBlank())
+					field_value_list.add(row[i].strip());
+				else
+					for (String eachValue : row[i].strip().split(multiValueSep))
+						field_value_list.add(eachValue);
+				for(String field_value : field_value_list) {
+					for(String extractedKeys : deepKVPextractKeys(field_name, field_value)) {
+						if(!keyMaster.contains(extractedKeys))
+							keyMaster.add(extractedKeys);
+					}
+				}
+			}
+		}
 
 	public boolean next() throws Exception {
 		dataDict.clear();
@@ -117,5 +129,19 @@ public class ParseSIPCSV extends Parser {
 			
 		}
 		return deepKVP;
+	}
+	ArrayList<String> deepKVPextractKeys(String field, String value) {
+		ArrayList<String> deepKeys = new ArrayList<String>();
+		//System.out.println(value);
+		try {
+		JsonObject jsonObject = parser.parse(value).getAsJsonObject();
+		for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+			String extendedField = field + "@" + entry.getKey();
+			deepKeys.add(extendedField);
+		}
+		} catch (Exception e) {
+			
+		}
+		return deepKeys;
 	}
 }

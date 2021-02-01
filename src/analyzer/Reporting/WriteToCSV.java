@@ -85,7 +85,7 @@ public class WriteToCSV extends CSVConfiguration {
 		}
 		if (writetomatch && !Splitter.report_matched.isEmpty())
 			allRows_matched.add(row);
-		else if (!Splitter.report_unmatched.isEmpty())
+		else if (!(writetomatch || Splitter.report_unmatched.isEmpty()))
 			allRows_unmatched.add(row);
 	}
 
