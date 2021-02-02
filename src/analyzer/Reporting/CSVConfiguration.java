@@ -39,10 +39,10 @@ public class CSVConfiguration {
 				ID=prop.getProperty("ID");
 			else {
 				System.out.println("ID field is not provided in the CSV Configuration File."
-						+ "\nDo you want to default it to handle_ID or set new value(case-sensitive) or terminate?[Yes/New/No]");
+						+ "\nDo you want to default it to Handle_ID or set new value(case-sensitive) or terminate?[Yes/New/No]");
 				Scanner in = new Scanner(System.in);
 				if(in.next().equalsIgnoreCase("yes"))
-					ID = "handle_ID";
+					ID = "Handle_ID";
 				else if (in.next().equalsIgnoreCase("new"))
 					ID = in.next();
 				else if (in.next().equalsIgnoreCase("no")) {
