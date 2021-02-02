@@ -70,10 +70,10 @@ public class Splitter {
 		for(String source : sourceList) {
 			Parser parser = factory.getParser(source, dataReadPath);
 			for(String key : parser.loadKeys())
-				if(!keyMaster.contains(key))
-					keyMaster.add(key);
+				if(!reportWriter.keyMaster.contains(key))
+					reportWriter.keyMaster.add(key);
 		}
-			
+		reportWriter.loadReportHeader();
 		for (String source : sourceList) {
 			source = source.strip();
 			if(source.isEmpty())
