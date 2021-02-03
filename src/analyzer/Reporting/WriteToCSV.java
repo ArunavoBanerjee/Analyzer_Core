@@ -29,6 +29,7 @@ public class WriteToCSV extends CSVConfiguration {
 	File csvout = null;
 	CSVWriter cwriter = null;
 	int file_i_matched = 0, file_i_unmatched = 0;
+	boolean createTGT_matched = true, createTGT_unmatched = true;
 
 	public WriteToCSV() throws Exception {
 	}
@@ -39,7 +40,8 @@ public class WriteToCSV extends CSVConfiguration {
 			header.add(ID);
 			header.addAll(field_to_write);
 		} else {
-			header.add(0, ID);
+			header.add(ID);
+			keyMaster.remove(ID);
 			header.addAll(keyMaster);
 		}
 		header_row = header.toArray(new String[0]);
@@ -75,80 +77,40 @@ public class WriteToCSV extends CSVConfiguration {
 	}
 
 	public boolean csvwriter_matched() throws Exception {
-		if (allRows_matched.size() == 0)
-			return false;
-		else {
+		if (createTGT_matched) {
+			createTGT_matched = false;
 			Date writeDate = new Date("yyyy_MM_dd-HH_mm_ss");
 			Splitter.report_matched += File.separatorChar + writeDate.getDate();
-			List<String[]> filerows = new ArrayList<String[]>();
-			boolean createTGT = true;
-			for (int row_i = 0; row_i < allRows_matched.size(); row_i++) {
-				if (createTGT) {
-					createTGT = false;
-					if (!new File(Splitter.report_matched).exists())
-						new File(Splitter.report_matched).mkdirs();
-				}
-				filerows.add(allRows_matched.get(row_i));
-				if (row_i / rowlimit != file_i_matched) {
-					fileName = file_i_matched + ".csv";
-					csvout = new File(Splitter.report_matched + File.separatorChar + fileName);
-					cwriter = new CSVWriter(new FileWriter(csvout));
-					cwriter.writeNext(header_row);
-					cwriter.writeAll(filerows);
-					filerows.clear();
-					cwriter.close();
-					file_i_matched = row_i / rowlimit;
-				}
-			}
-			if (!filerows.isEmpty()) {
-				fileName = file_i_matched + ".csv";
-				csvout = new File(Splitter.report_matched + File.separatorChar + fileName);
-				cwriter = new CSVWriter(new FileWriter(csvout));
-				cwriter.writeNext(header_row);
-				cwriter.writeAll(filerows);
-				filerows.clear();
-				cwriter.close();
-			}
-			return true;
+			if (!new File(Splitter.report_matched).exists())
+				new File(Splitter.report_matched).mkdirs();
 		}
+		fileName = file_i_matched + ".csv";
+		csvout = new File(Splitter.report_matched + File.separatorChar + fileName);
+		cwriter = new CSVWriter(new FileWriter(csvout));
+		cwriter.writeNext(header_row);
+		cwriter.writeAll(allRows_matched);
+		cwriter.close();
+		allRows_matched.clear();
+		file_i_matched++;
+		return true;
 	}
 
 	public boolean csvwriter_unmatched() throws Exception {
-		if (allRows_unmatched.size() == 0)
-			return false;
-		else {
+		if (createTGT_unmatched) {
+			createTGT_unmatched = false;
 			Date writeDate = new Date("yyyy_MM_dd-HH_mm_ss");
 			Splitter.report_unmatched += File.separatorChar + writeDate.getDate();
-			List<String[]> filerows = new ArrayList<String[]>();
-			boolean createTGT = true;
-			for (int row_i = 0; row_i < allRows_unmatched.size(); row_i++) {
-				if (createTGT) {
-					createTGT = false;
-					if (!new File(Splitter.report_unmatched).exists())
-						new File(Splitter.report_unmatched).mkdirs();
-				}
-				filerows.add(allRows_unmatched.get(row_i));
-				if (row_i / rowlimit != file_i_unmatched) {
-					fileName = file_i_unmatched + ".csv";
-					csvout = new File(Splitter.report_unmatched + File.separatorChar + fileName);
-					cwriter = new CSVWriter(new FileWriter(csvout));
-					cwriter.writeNext(header_row);
-					cwriter.writeAll(filerows);
-					filerows.clear();
-					cwriter.close();
-					file_i_unmatched = row_i / rowlimit;
-				}
-			}
-			if (!filerows.isEmpty()) {
-				fileName = file_i_unmatched + ".csv";
-				csvout = new File(Splitter.report_unmatched + File.separatorChar + fileName);
-				cwriter = new CSVWriter(new FileWriter(csvout));
-				cwriter.writeNext(header_row);
-				cwriter.writeAll(filerows);
-				filerows.clear();
-				cwriter.close();
-			}
-			return true;
+			if (!new File(Splitter.report_unmatched).exists())
+				new File(Splitter.report_unmatched).mkdirs();
 		}
+		fileName = file_i_unmatched + ".csv";
+		csvout = new File(Splitter.report_unmatched + File.separatorChar + fileName);
+		cwriter = new CSVWriter(new FileWriter(csvout));
+		cwriter.writeNext(header_row);
+		cwriter.writeAll(allRows_unmatched);
+		cwriter.close();
+		allRows_unmatched.clear();
+		file_i_unmatched++;
+		return true;
 	}
 }

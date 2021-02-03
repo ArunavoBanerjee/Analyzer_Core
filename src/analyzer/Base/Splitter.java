@@ -67,16 +67,16 @@ public class Splitter {
 		dest_unmatched = dest_unmatched.replaceAll("\\.tar\\.gz$", "");
 		SourceParserFactory factory = new SourceParserFactory();
 		factory.csvMultivalueSep = csvMultivalueSep;
-		for(String source : sourceList) {
+		for (String source : sourceList) {
 			Parser parser = factory.getParser(source, dataReadPath);
-			for(String key : parser.loadKeys())
-				if(!reportWriter.keyMaster.contains(key))
+			for (String key : parser.loadKeys())
+				if (!reportWriter.keyMaster.contains(key))
 					reportWriter.keyMaster.add(key);
 		}
 		reportWriter.loadReportHeader();
 		for (String source : sourceList) {
 			source = source.strip();
-			if(source.isEmpty())
+			if (source.isEmpty())
 				continue;
 			int source_count = 0;
 			Parser parser = factory.getParser(source, dataReadPath);
@@ -204,10 +204,12 @@ public class Splitter {
 			if (tos_unmatch != null)
 				tos_unmatch.close();
 		}
-		if (!report_matched.isEmpty())
-			matchSet = reportWriter.csvwriter_matched();
-		if (!report_unmatched.isEmpty())
-			unmatchSet = reportWriter.csvwriter_unmatched();
+		if (!dataOnly) {
+			if (!report_matched.isEmpty())
+				matchSet = reportWriter.csvwriter_matched();
+			if (!report_unmatched.isEmpty())
+				unmatchSet = reportWriter.csvwriter_unmatched();
+		}
 		print_output();
 	}
 
