@@ -33,6 +33,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import analyzer.Evaluator.Evaluator;
 import analyzer.Reporting.WriteToCSV;
 import analyzer.SourceAdaptors.Parser;
 import analyzer.SourceAdaptors.SourceParserFactory;
@@ -48,14 +49,15 @@ public class Splitter {
 	public static boolean isReport = false, dataOnly = false, keepsrchier = false, matchSet = false, unmatchSet = false;
 	boolean writetomatch = true;
 	WriteToCSV reportWriter = null;
-	Validator new_validator = null;
+	Evaluator eval = null;
 	public static int batchSize = 0;
 	int match_count = 0, unmatch_count = 0, count_item = 0;
 	TarArchiveOutputStream tos_match = null;
 	TarArchiveOutputStream tos_unmatch = null;
 
-	public Splitter(Validator in) throws Exception {
-		this.new_validator = in;
+	public Splitter(Validator _v_in) throws Exception {
+		if(_v_in != null)
+			this.eval = new Evaluator(_v_in);
 	}
 
 	public void churnData() throws Exception {
@@ -82,8 +84,8 @@ public class Splitter {
 			Parser parser = factory.getParser(source, dataReadPath);
 			while (parser.next()) {
 				writetomatch = true;
-				if (new_validator != null)
-					writetomatch = new_validator.validate(parser.dataDict);
+				if (eval != null)
+					writetomatch = eval.evaluate(parser.dataDict);
 				if (!dataOnly)
 					reportWriter.csvloader(parser.dataDict, writetomatch);
 				if (!isReport) {
@@ -226,7 +228,7 @@ public class Splitter {
 
 	void print_output() {
 		System.out.println("Matched #:" + match_count + "  UnMatched #:" + unmatch_count);
-		if (new_validator == null)
+		if (eval == null)
 			System.out.println("Report Destination: " + report_matched);
 		else {
 			if (!(dest_matched.isEmpty() || isReport)) {

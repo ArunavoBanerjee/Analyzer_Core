@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import analyzer.Engine.BooleanParser;
-import analyzer.Engine.ItemPatternMatcher;
-import analyzer.Engine.StrPatternMatcher;
+import analyzer.Evaluator.BooleanParser;
 import analyzer.PatternLoader.Data;
 import analyzer.PatternLoader.LoadPatterns;
 
@@ -28,10 +26,10 @@ public class Validator {
 	public static String dataType = "", matchType = "", matchCase = "", left_token = "", right_token = "", expr_str = "", splitlistPath = "";
 	public static HashMap<String, Data> exprfieldList = new HashMap<String, Data>();
 	List<String> splitexpr_input = new ArrayList<String>();
-	List<String> splitexpr = new ArrayList<String>();
-	List<String> expr = new ArrayList<String>();
+	public List<String> splitexpr = new ArrayList<String>();
+	public ArrayList<String> expr = new ArrayList<String>();
 	MatchPropValidator mpv = new MatchPropValidator();
-	BooleanParser boolParse = new BooleanParser();
+	public BooleanParser boolParse = new BooleanParser();
 	Boolean patternLoadRequired = false;
 
 	public Validator() throws Exception {
@@ -115,48 +113,4 @@ public class Validator {
 //				pr.print(entry.getKey() + " : " + Arrays.asList(row)+"\n");
 //		}
 //	}
-	public boolean validate(HashMap<String, HashSet<String>> sourceDict) {
-		Boolean writetomatch = true;
-		for (Map.Entry<String, Data> entry : exprfieldList.entrySet()) {
-			boolean splitFlag = false;
-			String testField = entry.getKey();
-			Data testCondition = entry.getValue();
-			if (sourceDict.containsKey(testField)) {
-				if (testCondition == null)
-					splitFlag = true;
-				else {
-					for (String value : sourceDict.get(testField)) {
-						if (patternMatcher(testCondition, value)) {
-							splitFlag = true;
-							if (!splitexpr.isEmpty())
-								expr.set(splitexpr.indexOf(testField), String.valueOf(true));
-							break;
-						}
-					}
-				}
-			}
-			if (!splitexpr.isEmpty()) {
-				// System.out.println(expr+""+splitexpr+entry.getKey());
-				if (splitFlag) {
-					expr.set(splitexpr.indexOf(entry.getKey()), String.valueOf(true));
-				} else
-					expr.set(splitexpr.indexOf(entry.getKey()), String.valueOf(false));
-			}
-		}
-		if (!splitexpr.isEmpty())
-			writetomatch = boolParse.evalExpr(expr);
-
-		return writetomatch;
-	}
-
-	boolean patternMatcher(Data data, String fieldValue) {
-		for (ArrayList<String> patternClass : data.patternMap.keySet()) {
-			String dataType = patternClass.get(0);
-			if (dataType.matches("str|regx") && StrPatternMatcher.getInstance().str_matcher(fieldValue, patternClass, data.patternMap.get(patternClass)))
-				return true;
-			else if (dataType.matches("item") && ItemPatternMatcher.getInstance().item_matcher(fieldValue, patternClass, data))
-				return true;
-		}
-		return false;
-	}
 }

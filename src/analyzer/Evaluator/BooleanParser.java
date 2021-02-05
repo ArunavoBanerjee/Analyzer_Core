@@ -1,4 +1,4 @@
-package analyzer.Engine;
+package analyzer.Evaluator;
 
 import java.util.HashSet;
 import java.util.List;
