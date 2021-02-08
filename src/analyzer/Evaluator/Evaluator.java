@@ -15,7 +15,7 @@ Validator v = null;
 	}
 	public boolean evaluate(HashMap<String, HashSet<String>> sourceDict) {
 		Boolean writetomatch = true;
-		for (Map.Entry<String, Data> entry : v.exprfieldList.entrySet()) {
+		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
 			boolean splitFlag = false;
 			String testField = entry.getKey();
 			Data testCondition = entry.getValue();
