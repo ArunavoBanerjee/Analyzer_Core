@@ -34,7 +34,8 @@ public class ParseSIPTar extends Parser {
 	String tarName = "";
 	File tarFile = null;
 	HashSet<String> parentsRead = new HashSet<String>();
-
+	ParseXMLtoDict toDict = new ParseXMLtoDict();
+	
 	public ParseSIPTar(String _tarPath, String _dataReadPath) throws Exception {
 		// TODO Auto-generated constructor stub
 		dataReadPath = _dataReadPath;
@@ -112,7 +113,7 @@ public class ParseSIPTar extends Parser {
 						entryMap.put(tarEntryName, content);
 						if (tarEntryName.endsWith(".xml")) {
 							String contentString = new String(content);
-							ParseXMLtoDict.getSourceInfo(contentString, dataDict);
+							dataDict = toDict.getSourceInfo(contentString);
 						} else if (tarEntryName.endsWith("handle")) {
 							String handle = new String(content).strip();
 							dataDict.put("Handle_ID", new HashSet<String>() {

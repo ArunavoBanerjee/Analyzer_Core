@@ -33,6 +33,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.google.gson.JsonElement;
+
 import analyzer.Evaluator.Evaluator;
 import analyzer.Reporting.WriteToCSV;
 import analyzer.SourceAdaptors.Parser;
@@ -41,7 +43,8 @@ import analyzer.Validators.Validator;
 
 public class Splitter {
 	public static String reportDest = "", dest_matched = "", dest_unmatched = "", dataReadPath = "", matched_tarPath = "", unmatched_tarPath = "";
-	public static String csvconfigPath = "", report_unmatched = "", report_matched = "", csvMultivalueSep = "";
+	public static String csvconfigPath = "", schemaPath = "", schemaFileUsage="general", report_unmatched = "", report_matched = "", csvMultivalueSep = "";
+	public static HashMap<String, HashMap<String,JsonElement>> NDLSchemaInfo = new HashMap<String, HashMap<String,JsonElement>>();
 	ArrayList<String> matchedNameList = new ArrayList<String>();
 	ArrayList<String> unmatchedNameList = new ArrayList<String>();
 	ArrayList<String> keyMaster = new ArrayList<String>();

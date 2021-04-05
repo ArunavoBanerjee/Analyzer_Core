@@ -1,0 +1,284 @@
+{
+  "dc.contributor.author": {
+    "datatype": "person",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.contributor.editor": {
+    "datatype": "person",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.contributor.illustrator": {
+    "datatype": "person",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.contributor.advisor": {
+    "datatype": "person",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.creator.researcher": {
+    "datatype": "person",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.language.iso": {
+    "datatype": "language",
+    "multiValued": true,
+    "controled": true,
+    "validation":false
+  },
+  "dc.publisher.department": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.contributor.other@commentator": {
+    "datatype": "person",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.contributor.other@organization": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.description.abstract": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false,
+	"validation":false
+  },
+  "dc.description.sponsorship": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.description.searchVisibility": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": true,
+    "validation":false
+  },
+  "dc.description": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false,
+	"validation":false
+  },
+  "dc.identifier.isbn": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.identifier.issn": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
+  "ndl.sourceMeta.additionalInfo@note": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.identifier.other@alternateWebpageUri": {
+    "datatype": "uri",
+    "multiValued": true,
+    "controled": false,
+	"validation":false
+  },
+  "dc.identifier.uri": {
+    "datatype": "uri",
+    "multiValued": false,
+    "controled": false,
+	"validation":false
+  },
+  "dc.identifier.other@doi": {
+    "datatype": "uri",
+    "multiValued": false,
+    "controled": false,
+	"validation":false
+  },
+  "dc.identifier.other@eissn": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.identifier.other@journal": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.identifier.other@volume": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.identifier.other@edition": {
+    "datatype": "Integer",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.subject.ddc": {
+    "datatype": "ddc",
+    "multiValued": true,
+    "controled": true,
+    "validation":false
+  },
+  "dc.subject.mesh": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": true,
+    "validation":false
+  },  
+  "dc.subject": {
+    "datatype": "shortText",
+    "multiValued": true,
+    "controled": false,
+    "validation":false
+  },
+  "dc.relation.requires": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.format.mimetype": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": true,
+    "validation":false
+  },
+  "dc.type": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": true,
+    "validation":false
+  },
+  "dc.date.copyright": {
+    "datatype": "date",
+    "multiValued": false,
+    "controled": false,
+    "validation":false
+  },
+  "dc.date.issued": {
+    "datatype": "date",
+    "multiValued": false,
+    "controled": false,
+    "validation":false
+  },
+  "dc.title": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false,
+    "validation":false
+  },
+  "dc.rights.holder": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.rights.license": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.rights.accessRights": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": true,
+    "validation":false
+  },
+  "dc.publisher": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.publisher.date": {
+    "datatype": "date",
+    "multiValued": false,
+    "controled": false,
+	"validation":false
+  },
+  "ndl.sourceMeta.additionalInfo@references": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "ndl.sourceMeta.additionalInfo@relatedContentUrl": {
+    "datatype": "uri",
+    "multiValued": true,
+    "controled": false,
+    "validation": true
+  },
+  "ndl.sourceMeta.additionalInfo@RightsStatement": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false,
+    "validation": true
+  },													  
+  "dc.publisher.institution": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.publisher.place": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "lrmi.educationalUse": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": true,
+	"validation":false
+  },
+  "lrmi.typicalAgeRange": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": true,
+	"validation":false
+  },
+  "lrmi.learningResourceType": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": true,
+	"validation":false
+  },
+  "dc.source.uri": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.format.extent@startingPage": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.format.extent@endingPage": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.format.extent@pageCount": {
+    "datatype": "Integer",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.relation.ispartof": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
+  "dc.subject.other": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.relation.ispartofseries": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  }
+}

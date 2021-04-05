@@ -20,46 +20,38 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import analyzer.Base.Splitter;
+
 public class ParseXMLtoDict {
 
-	static void getSourceInfo(File sipItem, HashMap<String, HashSet<String>> dict) throws Exception {
-		JsonParser parser = new JsonParser();
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	HashMap<String, HashSet<String>> dataDict = new HashMap<String, HashSet<String>>();
+	DocumentBuilderFactory dbf = null;
+	DocumentBuilder documentBuilder = null;
+	
+	public ParseXMLtoDict() throws Exception {
+		dbf = DocumentBuilderFactory.newInstance();
 		dbf.setValidating(false);
-		DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+		documentBuilder = dbf.newDocumentBuilder();
+	}
+	
+	HashMap<String, HashSet<String>> getSourceInfo(File sipItem ) throws Exception {
 		Document inputDoc = documentBuilder.parse(sipItem);
 		Element root = inputDoc.getDocumentElement();
 		String schema = root.getAttribute("schema");
 		NodeList docNodes = root.getChildNodes();
+		dataDict.clear();
 		for (int i = 0; i < docNodes.getLength(); i++) {
 			Node docNode = docNodes.item(i);
 			if (docNode.getNodeType() != Node.ELEMENT_NODE)
 				continue;
 			String nodeNameNDL = formReadable(docNode, schema);
 			String textContent = docNode.getTextContent().trim();
-			try {
-				JsonObject jsonObject = parser.parse(textContent).getAsJsonObject();
-				for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-					nodeNameNDL = nodeNameNDL + "@" + entry.getKey();
-					textContent = entry.getValue().getAsString();
-				}
-			} catch (Exception e) {
-
-			}
-			if (!dict.containsKey(nodeNameNDL)) {
-				HashSet<String> values = new HashSet<String>();
-				values.add(textContent);
-				dict.put(nodeNameNDL, values);
-			} else
-				dict.get(nodeNameNDL).add(textContent);
+			KVPextract(nodeNameNDL, textContent);
 		}
+		return dataDict;
 	}
 	
-	static void getSourceInfo(String itemContent, HashMap<String, HashSet<String>> dict) throws Exception {
-		JsonParser parser = new JsonParser();
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setValidating(false);
-		DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+	HashMap<String, HashSet<String>> getSourceInfo(String itemContent) throws Exception {	
 		Document inputDoc = documentBuilder.parse(new InputSource(new StringReader(itemContent)));
 		Element root = inputDoc.getDocumentElement();
 		String schema = root.getAttribute("schema");
@@ -70,22 +62,9 @@ public class ParseXMLtoDict {
 				continue;
 			String nodeNameNDL = formReadable(docNode, schema);
 			String textContent = docNode.getTextContent().trim();
-			try {
-				JsonObject jsonObject = parser.parse(textContent).getAsJsonObject();
-				for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-					nodeNameNDL = nodeNameNDL + "@" + entry.getKey();
-					textContent = entry.getValue().getAsString();
-				}
-			} catch (Exception e) {
-
-			}
-			if (!dict.containsKey(nodeNameNDL)) {
-				HashSet<String> values = new HashSet<String>();
-				values.add(textContent);
-				dict.put(nodeNameNDL, values);
-			} else
-				dict.get(nodeNameNDL).add(textContent);
+			KVPextract(nodeNameNDL, textContent);
 		}
+		return dataDict;
 	}
 
 	static String formReadable(Node thisNode, String schema) {
@@ -101,11 +80,42 @@ public class ParseXMLtoDict {
 				break;
 			}
 		}
-
 		read = (schema + "." + element + "." + qualifier);
 		read = read.replaceAll("[.]$", "");
-
 		return read;
 	}
 	
+	void KVPextract(String nodeNameNDL, String textContent) throws Exception {
+		JsonParser parser = new JsonParser();
+		if (!Splitter.NDLSchemaInfo.containsKey(nodeNameNDL)) {
+			try {
+				Object obj = parser.parse(textContent);
+				JsonObject jsonObject = (JsonObject) obj;
+				for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+					nodeNameNDL = nodeNameNDL + "@" + entry.getKey();
+					textContent = entry.getValue().getAsString().replace("\\", "\\\\");
+					if (!dataDict.containsKey(nodeNameNDL)) {
+						HashSet<String> values = new HashSet<String>();
+						values.add(textContent);
+						dataDict.put(nodeNameNDL, values);
+					} else
+						dataDict.get(nodeNameNDL).add(textContent);
+				}
+			} catch (Exception e) {
+				if (!dataDict.containsKey(nodeNameNDL)) {
+					HashSet<String> values = new HashSet<String>();
+					values.add(textContent);
+					dataDict.put(nodeNameNDL, values);
+				} else
+					dataDict.get(nodeNameNDL).add(textContent);
+			}
+		} else {
+			if (!dataDict.containsKey(nodeNameNDL)) {
+				HashSet<String> values = new HashSet<String>();
+				values.add(textContent);
+				dataDict.put(nodeNameNDL, values);
+			} else
+				dataDict.get(nodeNameNDL).add(textContent);
+		}
+	}
 }

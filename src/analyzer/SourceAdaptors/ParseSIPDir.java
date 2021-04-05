@@ -32,6 +32,8 @@ import com.google.gson.JsonParser;
 public class ParseSIPDir extends Parser {
 	ArrayList<File> childList = new ArrayList<File>();
 	String sourceName = "";
+	ParseXMLtoDict toDict = new ParseXMLtoDict();
+	
 	public ParseSIPDir(String _SIPRoot) throws Exception {
 		// TODO Auto-generated constructor stub
 		File f_SIPRoot = new File(_SIPRoot);
@@ -59,7 +61,6 @@ public class ParseSIPDir extends Parser {
 	}
 
 	public boolean next() throws Exception {
-		dataDict.clear();
 		entryMap.clear();
 		if (childList.isEmpty())
 			return false;
@@ -69,10 +70,10 @@ public class ParseSIPDir extends Parser {
 				byte[] content = Files.readAllBytes(Paths.get(sipEntry));
 				entryMap.put(sipEntry, content);
 				if (sipContent.getName().endsWith(".xml")) {
-					ParseXMLtoDict.getSourceInfo(sipContent,dataDict);
+					dataDict = toDict.getSourceInfo(sipContent);
 				} else if (sipContent.getName().equals("handle")) {
 					BufferedReader br = new BufferedReader(new FileReader(sipContent));
-					dataDict.put("handle_ID", new HashSet<String>() {
+					dataDict.put("Handle_ID", new HashSet<String>() {
 						{
 							add(br.readLine());
 						}
