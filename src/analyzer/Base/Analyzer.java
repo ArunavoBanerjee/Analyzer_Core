@@ -37,6 +37,8 @@ public class Analyzer {
 		InputStream input = new FileInputStream(properties);
 		prop.load(input);
 
+		Splitter.rootLocation = prop.getProperty("rootPath","").strip();
+		
 		/**
 		 * Set Validator parameters and verify.
 		 */
@@ -53,6 +55,7 @@ public class Analyzer {
 		if (prop.getProperty("splitExpression") != null)
 			Validator.expr_str = prop.getProperty("splitExpression").strip().replaceAll("\\s*:\\s*", ":")
 					.replaceAll("\\s+", " ");
+	
 		if (!Splitter.isReport && Validator.expr_str.isBlank())
 			throw new Exception("Split Expression is mandatory for data splitting.");
 		if (prop.getProperty("splitListFile") != null)

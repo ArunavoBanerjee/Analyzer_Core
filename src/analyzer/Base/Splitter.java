@@ -42,6 +42,7 @@ import analyzer.SourceAdaptors.SourceParserFactory;
 import analyzer.Validators.Validator;
 
 public class Splitter {
+	public static String rootLocation = "";
 	public static String reportDest = "", dest_matched = "", dest_unmatched = "", dataReadPath = "", matched_tarPath = "", unmatched_tarPath = "";
 	public static String csvconfigPath = "", schemaPath = "", schemaFileUsage="general", report_unmatched = "", report_matched = "", csvMultivalueSep = "";
 	public static HashMap<String, HashMap<String,JsonElement>> NDLSchemaInfo = new HashMap<String, HashMap<String,JsonElement>>();
