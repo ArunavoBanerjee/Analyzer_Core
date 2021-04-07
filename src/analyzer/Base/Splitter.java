@@ -151,7 +151,7 @@ public class Splitter {
 								}
 							}
 							_tarEntryName = dataentry.getKey();
-							System.out.println(_tarEntryName);
+//							System.out.println(_tarEntryName);
 							if (!keepsrchier) {
 								// TODO Can be replaced with a Parser variable. Needs Analysis.
 								root = _tarEntryName.substring(0, _tarEntryName.indexOf('/'));
