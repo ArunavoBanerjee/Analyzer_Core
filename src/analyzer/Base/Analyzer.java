@@ -58,9 +58,10 @@ public class Analyzer {
 	
 		if (!Splitter.isReport && Validator.expr_str.isBlank())
 			throw new Exception("Split Expression is mandatory for data splitting.");
-		if (prop.getProperty("splitListFile") != null)
-			Validator.splitlistPath = prop.getProperty("splitListFile").strip();
-
+		
+		if (prop.getProperty("splitListFile") != null) {
+			Validator.splitlistPath = Splitter.rootLocation+"/"+prop.getProperty("splitListFile").strip();
+		}
 		Validator new_validator = null;
 		if (!(reportType.equals("-r") && Validator.expr_str.isBlank())) {
 			new_validator = new Validator();
@@ -69,11 +70,11 @@ public class Analyzer {
 		Splitter.sourceList = prop.getProperty("sourceFile").split(",");
 		Splitter.csvMultivalueSep = prop.getProperty("csvMultivalueSep","||").strip();
 		if (prop.getProperty("targetFileMatched") != null)
-			Splitter.dest_matched = prop.getProperty("targetFileMatched").strip();
+			Splitter.dest_matched = Splitter.rootLocation + "/" + prop.getProperty("targetFileMatched").strip();
 		if (prop.getProperty("targetFileUnMatched") != null)
-			Splitter.dest_unmatched = prop.getProperty("targetFileUnMatched").strip();
+			Splitter.dest_unmatched = Splitter.rootLocation + "/" + prop.getProperty("targetFileUnMatched").strip();
 		if (prop.getProperty("reportDestination") != null)
-			Splitter.reportDest = prop.getProperty("reportDestination").strip();
+			Splitter.reportDest = Splitter.rootLocation + "/" + prop.getProperty("reportDestination").strip();
 		if (prop.getProperty("keepSourceHier") != null)
 			Splitter.keepsrchier = Boolean.valueOf(prop.getProperty("keepSourceHier").strip());
 
@@ -95,7 +96,7 @@ public class Analyzer {
 		if (prop.getProperty("dataReadPath") != null)
 			Splitter.dataReadPath = prop.getProperty("dataReadPath");
 		if (prop.getProperty("csvConfigPath") != null)
-			Splitter.csvconfigPath = prop.getProperty("csvConfigPath");
+			Splitter.csvconfigPath = Splitter.rootLocation + "/" + prop.getProperty("csvConfigPath");
 
 		Splitter newSplit = new Splitter(new_validator);
 		newSplit.churnData();

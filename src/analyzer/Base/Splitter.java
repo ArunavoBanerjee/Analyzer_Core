@@ -74,6 +74,7 @@ public class Splitter {
 		SourceParserFactory factory = new SourceParserFactory();
 		factory.csvMultivalueSep = csvMultivalueSep;
 		for (String source : sourceList) {
+			source = rootLocation+"/"+source;
 			Parser parser = factory.getParser(source, dataReadPath);
 			for (String key : parser.loadKeys())
 				if (!reportWriter.keyMaster.contains(key))
@@ -85,6 +86,7 @@ public class Splitter {
 			if (source.isEmpty())
 				continue;
 			int source_count = 0;
+			source = rootLocation+"/"+source;
 			Parser parser = factory.getParser(source, dataReadPath);
 			while (parser.next()) {
 				writetomatch = true;
