@@ -89,7 +89,7 @@ public class MatchPropValidator {
 	}
 
 	void item_mpValidator() throws Exception {
-		if (!matchProp.get(1).matches("(?i)exists")) {
+		if (!matchProp.get(1).matches("(?i)exists|uniq")) {
 			throw new Exception("matchType " + matchProp.get(1) + " is not valid.\nItem datatype only supports exists condition till the current version.");
 		}
 	}
