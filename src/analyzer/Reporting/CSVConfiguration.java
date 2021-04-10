@@ -14,7 +14,7 @@ import analyzer.Base.Splitter;
 public class CSVConfiguration {
 	int rowlimit = 0;
 	String multivalue_seperator = "", ID = "";
-	Set<String> field_to_write = new HashSet<String>();
+	public Set<String> field_to_write = new HashSet<String>();
 	public CSVConfiguration() throws Exception {
 		Properties prop = new Properties();
 		try {

@@ -45,15 +45,14 @@ public class ParseSIPCSV extends Parser {
 		return true;
 	}
 	
-	public ArrayList<String> loadKeys() throws Exception {
+	public void loadKeys(ArrayList<String> keyMaster) throws Exception {
 		String[] row = null;
-		ArrayList<String> keyList = new ArrayList<String>();
 		while ((row = cr.readNext()) != null) {
 			for (int i = 0; i < row.length; i++) {
 				if(row[i].isBlank())
 					continue;
 				String field_name = header[i].strip();
-				keyList.add(field_name);
+				keyMaster.add(field_name);
 				HashSet<String> field_value_list = new HashSet<String>();
 				if(multiValueSep.isBlank())
 					field_value_list.add(row[i].strip());
@@ -62,13 +61,12 @@ public class ParseSIPCSV extends Parser {
 						field_value_list.add(eachValue);
 				for(String field_value : field_value_list) {
 					for(String extractedKeys : deepKVPextractKeys(field_name, field_value)) {
-						if(!keyList.contains(extractedKeys))
-							keyList.add(extractedKeys);
+						if(!keyMaster.contains(extractedKeys))
+							keyMaster.add(extractedKeys);
 					}
 				}
 			}
 		}
-		return keyList;
 	}
 
 	public boolean next() throws Exception {

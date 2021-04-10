@@ -58,8 +58,7 @@ public class ParseSIPTar extends Parser {
 //		System.exit(0);
 	}
 	
-	public ArrayList<String> loadKeys() throws Exception {
-		ArrayList<String> keyMaster = new ArrayList<String>();
+	public void loadKeys(ArrayList<String> keyMaster) throws Exception {
 		TarArchiveInputStream tis_iterKeys = new TarArchiveInputStream(fis);
 		while(tis_iterKeys.getNextTarEntry() != null) {
 			String tarEntryName = in_tarEntry.getName();
@@ -70,11 +69,10 @@ public class ParseSIPTar extends Parser {
 				int offset = 0;
 				tis.read(content, offset, content.length - offset);
 				String contentString = new String(content);
-				toDict.getSourceFieldsInfo(contentString, keyMaster);
+				toDict.getSourceFields(contentString, keyMaster);
 			}
 		}
 		tis_iterKeys.close();
-		return keyMaster;
 	}
 	
 	public String getSourceName() {

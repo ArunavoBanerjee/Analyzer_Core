@@ -80,6 +80,7 @@ public class ParseXMLtoDict {
 					keyMaster.add(nodeNameNDL);
 			} else {
 				String textContent = docNode.getTextContent().trim();
+				KVPextractKeys(nodeNameNDL, textContent, keyMaster);
 			}
 			}
 			
@@ -137,5 +138,19 @@ public class ParseXMLtoDict {
 			} else
 				dataDict.get(nodeNameNDL).add(textContent);
 		}
+	}
+	void KVPextractKeys(String nodeNameNDL, String textContent, ArrayList<String> keyMaster) {
+		JsonParser parser = new JsonParser();
+			try {
+				Object obj = parser.parse(textContent);
+				JsonObject jsonObject = (JsonObject) obj;
+				for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+					nodeNameNDL = nodeNameNDL + "@" + entry.getKey();
+					if(!keyMaster.contains(nodeNameNDL))
+						keyMaster.add(nodeNameNDL);
+				}
+			} catch (Exception e) {
+				
+			}
 	}
 }

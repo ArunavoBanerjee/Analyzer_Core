@@ -85,9 +85,7 @@ public class ParseSIPDir extends Parser {
 		}
 	}
 
-	public ArrayList<String> loadKeys() throws Exception {
-		ArrayList<String> keyMaster = new ArrayList<String>();
-		return keyMaster;
+	public void loadKeys(ArrayList<String> keyMaster) throws Exception {
 	}
 	
 }

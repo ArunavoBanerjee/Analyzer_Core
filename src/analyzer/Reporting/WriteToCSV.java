@@ -32,6 +32,7 @@ public class WriteToCSV extends CSVConfiguration {
 	boolean createTGT_matched = true, createTGT_unmatched = true;
 
 	public WriteToCSV() throws Exception {
+		
 	}
 
 	public boolean loadReportHeader() {

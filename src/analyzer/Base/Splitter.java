@@ -73,12 +73,12 @@ public class Splitter {
 		dest_unmatched = dest_unmatched.replaceAll("\\.tar\\.gz$", "");
 		SourceParserFactory factory = new SourceParserFactory();
 		factory.csvMultivalueSep = csvMultivalueSep;
+		if(reportWriter.field_to_write.isEmpty()) {
 		for (String source : sourceList) {
 			source = rootLocation+"/"+source;
 			Parser parser = factory.getParser(source, dataReadPath);
-			for (String key : parser.loadKeys())
-				if (!reportWriter.keyMaster.contains(key))
-					reportWriter.keyMaster.add(key);
+			parser.loadKeys(reportWriter.keyMaster);
+		}
 		}
 		reportWriter.loadReportHeader();
 		for (String source : sourceList) {
