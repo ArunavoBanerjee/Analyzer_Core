@@ -2,6 +2,7 @@ package analyzer.SourceAdaptors;
 
 import java.io.File;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -62,6 +63,26 @@ public class ParseXMLtoDict {
 			String textContent = docNode.getTextContent().trim();
 			KVPextract(nodeNameNDL, textContent, dataDict);
 		}
+	}
+	
+	void getSourceFields(String itemContent, ArrayList<String> keyMaster) throws Exception {
+		Document inputDoc = documentBuilder.parse(new InputSource(new StringReader(itemContent)));
+		Element root = inputDoc.getDocumentElement();
+		String schema = root.getAttribute("schema");
+		NodeList docNodes = root.getChildNodes();
+		for (int i = 0; i < docNodes.getLength(); i++) {
+			Node docNode = docNodes.item(i);
+			if (docNode.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			String nodeNameNDL = formReadable(docNode, schema);
+			if(Splitter.NDLSchemaInfo.containsKey(nodeNameNDL)) {
+				if(!keyMaster.contains(nodeNameNDL))
+					keyMaster.add(nodeNameNDL);
+			} else {
+				String textContent = docNode.getTextContent().trim();
+			}
+			}
+			
 	}
 
 	static String formReadable(Node thisNode, String schema) {
