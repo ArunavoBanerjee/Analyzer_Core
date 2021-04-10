@@ -70,7 +70,7 @@ public class ParseSIPDir extends Parser {
 				byte[] content = Files.readAllBytes(Paths.get(sipEntry));
 				entryMap.put(sipEntry, content);
 				if (sipContent.getName().endsWith(".xml")) {
-					dataDict = toDict.getSourceInfo(sipContent);
+					 toDict.getSourceInfo(sipContent, dataDict);
 				} else if (sipContent.getName().equals("handle")) {
 					BufferedReader br = new BufferedReader(new FileReader(sipContent));
 					dataDict.put("Handle_ID", new HashSet<String>() {

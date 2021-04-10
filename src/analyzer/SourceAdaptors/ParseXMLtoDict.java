@@ -24,7 +24,6 @@ import analyzer.Base.Splitter;
 
 public class ParseXMLtoDict {
 
-	HashMap<String, HashSet<String>> dataDict = new HashMap<String, HashSet<String>>();
 	DocumentBuilderFactory dbf = null;
 	DocumentBuilder documentBuilder = null;
 	
@@ -34,7 +33,7 @@ public class ParseXMLtoDict {
 		documentBuilder = dbf.newDocumentBuilder();
 	}
 	
-	HashMap<String, HashSet<String>> getSourceInfo(File sipItem ) throws Exception {
+	void getSourceInfo(File sipItem, HashMap<String, HashSet<String>> dataDict) throws Exception {
 		Document inputDoc = documentBuilder.parse(sipItem);
 		Element root = inputDoc.getDocumentElement();
 		String schema = root.getAttribute("schema");
@@ -46,12 +45,11 @@ public class ParseXMLtoDict {
 				continue;
 			String nodeNameNDL = formReadable(docNode, schema);
 			String textContent = docNode.getTextContent().trim();
-			KVPextract(nodeNameNDL, textContent);
+			KVPextract(nodeNameNDL, textContent, dataDict);
 		}
-		return dataDict;
 	}
 	
-	HashMap<String, HashSet<String>> getSourceInfo(String itemContent) throws Exception {	
+	void getSourceInfo(String itemContent, HashMap<String, HashSet<String>> dataDict) throws Exception {	
 		Document inputDoc = documentBuilder.parse(new InputSource(new StringReader(itemContent)));
 		Element root = inputDoc.getDocumentElement();
 		String schema = root.getAttribute("schema");
@@ -62,9 +60,8 @@ public class ParseXMLtoDict {
 				continue;
 			String nodeNameNDL = formReadable(docNode, schema);
 			String textContent = docNode.getTextContent().trim();
-			KVPextract(nodeNameNDL, textContent);
+			KVPextract(nodeNameNDL, textContent, dataDict);
 		}
-		return dataDict;
 	}
 
 	static String formReadable(Node thisNode, String schema) {
@@ -78,6 +75,8 @@ public class ParseXMLtoDict {
 			case "qualifier":
 				qualifier = attrs.getNamedItem("qualifier").getNodeValue();
 				break;
+			default:
+				break;
 			}
 		}
 		read = (schema + "." + element + "." + qualifier);
@@ -85,7 +84,7 @@ public class ParseXMLtoDict {
 		return read;
 	}
 	
-	void KVPextract(String nodeNameNDL, String textContent) throws Exception {
+	void KVPextract(String nodeNameNDL, String textContent, HashMap<String, HashSet<String>> dataDict) throws Exception {
 		JsonParser parser = new JsonParser();
 		if (!Splitter.NDLSchemaInfo.containsKey(nodeNameNDL)) {
 			try {

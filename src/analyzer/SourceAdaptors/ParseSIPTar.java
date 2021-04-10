@@ -28,6 +28,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class ParseSIPTar extends Parser {
+	FileInputStream fis = null;
 	TarArchiveInputStream tis = null;
 	String dataReadPath, trimPath;
 	TarArchiveEntry in_tarEntry;
@@ -46,7 +47,7 @@ public class ParseSIPTar extends Parser {
 		tarName = input_tar_gz.getName().replaceAll("\\.tar\\.gz$","");
 		String tarPath = input_tar_gz.getAbsolutePath();
 		tarFile = deCompressGZipFile(input_tar_gz, new File(tarPath.replace(".gz", "")));
-		FileInputStream fis = new FileInputStream(tarFile);
+		fis = new FileInputStream(tarFile);
 		tis = new TarArchiveInputStream(fis);
 //		while(tis.getNextTarEntry()!=null) {
 //		//for(int i=0;i<5;i++)
@@ -55,6 +56,25 @@ public class ParseSIPTar extends Parser {
 //		}
 //		System.out.println(tis.getCurrentEntry().getName() );
 //		System.exit(0);
+	}
+	
+	public ArrayList<String> loadKeys() throws Exception {
+		ArrayList<String> keyMaster = new ArrayList<String>();
+		TarArchiveInputStream tis_iterKeys = new TarArchiveInputStream(fis);
+		while(tis_iterKeys.getNextTarEntry() != null) {
+			String tarEntryName = in_tarEntry.getName();
+			if (!(tarEntryName.contains(dataReadPath) && in_tarEntry.isFile()))
+				continue;
+			else if(tarEntryName.endsWith(".xml")){
+				byte[] content = new byte[(int) in_tarEntry.getSize()];
+				int offset = 0;
+				tis.read(content, offset, content.length - offset);
+				String contentString = new String(content);
+				toDict.getSourceFieldsInfo(contentString, keyMaster);
+			}
+		}
+		tis_iterKeys.close();
+		return keyMaster;
 	}
 	
 	public String getSourceName() {
@@ -113,7 +133,7 @@ public class ParseSIPTar extends Parser {
 						entryMap.put(tarEntryName, content);
 						if (tarEntryName.endsWith(".xml")) {
 							String contentString = new String(content);
-							dataDict = toDict.getSourceInfo(contentString);
+							toDict.getSourceInfo(contentString, dataDict);
 						} else if (tarEntryName.endsWith("handle")) {
 							String handle = new String(content).strip();
 							dataDict.put("Handle_ID", new HashSet<String>() {
@@ -143,15 +163,8 @@ public class ParseSIPTar extends Parser {
 				break;
 			}
 		}
-
 		read = (schema + "." + element + "." + qualifier);
 		read = read.replaceAll("[.]$", "");
-
 		return read;
-	}
-	
-	public ArrayList<String> loadKeys() throws Exception {
-		ArrayList<String> keyMaster = new ArrayList<String>();
-		return keyMaster;
 	}
 }
