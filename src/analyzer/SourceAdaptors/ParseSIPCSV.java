@@ -60,10 +60,7 @@ public class ParseSIPCSV extends Parser {
 					for (String eachValue : row[i].strip().split(multiValueSep))
 						field_value_list.add(eachValue);
 				for(String field_value : field_value_list) {
-					for(String extractedKeys : deepKVPextractKeys(field_name, field_value)) {
-						if(!keyMaster.contains(extractedKeys))
-							keyMaster.add(extractedKeys);
-					}
+					deepKVPextractKeys(field_name, field_value, keyMaster);
 				}
 			}
 		}
@@ -130,8 +127,7 @@ public class ParseSIPCSV extends Parser {
 		}
 		return deepKVP;
 	}
-	ArrayList<String> deepKVPextractKeys(String field, String value) {
-		ArrayList<String> deepKeys = new ArrayList<String>();
+	void deepKVPextractKeys(String field, String value, ArrayList<String> deepKeys) {
 		//System.out.println(value);
 		try {
 		JsonObject jsonObject = parser.parse(value).getAsJsonObject();
@@ -142,6 +138,5 @@ public class ParseSIPCSV extends Parser {
 		} catch (Exception e) {
 			
 		}
-		return deepKeys;
 	}
 }

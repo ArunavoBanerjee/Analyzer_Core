@@ -27,11 +27,13 @@ public class ParseXMLtoDict {
 
 	DocumentBuilderFactory dbf = null;
 	DocumentBuilder documentBuilder = null;
+	KVPExtraction kvp = null;
 	
 	public ParseXMLtoDict() throws Exception {
 		dbf = DocumentBuilderFactory.newInstance();
 		dbf.setValidating(false);
 		documentBuilder = dbf.newDocumentBuilder();
+		kvp = new KVPExtraction();
 	}
 	
 	void getSourceInfo(File sipItem, HashMap<String, HashSet<String>> dataDict) throws Exception {
@@ -46,7 +48,7 @@ public class ParseXMLtoDict {
 				continue;
 			String nodeNameNDL = formReadable(docNode, schema);
 			String textContent = docNode.getTextContent().trim();
-			KVPextract(nodeNameNDL, textContent, dataDict);
+			kvp.KVPextract(nodeNameNDL, textContent, dataDict);
 		}
 	}
 	
@@ -61,7 +63,7 @@ public class ParseXMLtoDict {
 				continue;
 			String nodeNameNDL = formReadable(docNode, schema);
 			String textContent = docNode.getTextContent().trim();
-			KVPextract(nodeNameNDL, textContent, dataDict);
+			kvp.KVPextract(nodeNameNDL, textContent, dataDict);
 		}
 	}
 	
@@ -80,7 +82,7 @@ public class ParseXMLtoDict {
 					keyMaster.add(nodeNameNDL);
 			} else {
 				String textContent = docNode.getTextContent().trim();
-				KVPextractKeys(nodeNameNDL, textContent, keyMaster);
+				kvp.KVPextractKeys(nodeNameNDL, textContent, keyMaster);
 			}
 			}
 			
@@ -106,51 +108,4 @@ public class ParseXMLtoDict {
 		return read;
 	}
 	
-	void KVPextract(String nodeNameNDL, String textContent, HashMap<String, HashSet<String>> dataDict) throws Exception {
-		JsonParser parser = new JsonParser();
-		if (!Splitter.NDLSchemaInfo.containsKey(nodeNameNDL)) {
-			try {
-				Object obj = parser.parse(textContent);
-				JsonObject jsonObject = (JsonObject) obj;
-				for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-					nodeNameNDL = nodeNameNDL + "@" + entry.getKey();
-					textContent = entry.getValue().getAsString().replace("\\", "\\\\");
-					if (!dataDict.containsKey(nodeNameNDL)) {
-						HashSet<String> values = new HashSet<String>();
-						values.add(textContent);
-						dataDict.put(nodeNameNDL, values);
-					} else
-						dataDict.get(nodeNameNDL).add(textContent);
-				}
-			} catch (Exception e) {
-				if (!dataDict.containsKey(nodeNameNDL)) {
-					HashSet<String> values = new HashSet<String>();
-					values.add(textContent);
-					dataDict.put(nodeNameNDL, values);
-				} else
-					dataDict.get(nodeNameNDL).add(textContent);
-			}
-		} else {
-			if (!dataDict.containsKey(nodeNameNDL)) {
-				HashSet<String> values = new HashSet<String>();
-				values.add(textContent);
-				dataDict.put(nodeNameNDL, values);
-			} else
-				dataDict.get(nodeNameNDL).add(textContent);
-		}
-	}
-	void KVPextractKeys(String nodeNameNDL, String textContent, ArrayList<String> keyMaster) {
-		JsonParser parser = new JsonParser();
-			try {
-				Object obj = parser.parse(textContent);
-				JsonObject jsonObject = (JsonObject) obj;
-				for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-					nodeNameNDL = nodeNameNDL + "@" + entry.getKey();
-					if(!keyMaster.contains(nodeNameNDL))
-						keyMaster.add(nodeNameNDL);
-				}
-			} catch (Exception e) {
-				
-			}
-	}
 }

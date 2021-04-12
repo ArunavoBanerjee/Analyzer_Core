@@ -60,14 +60,14 @@ public class ParseSIPTar extends Parser {
 	
 	public void loadKeys(ArrayList<String> keyMaster) throws Exception {
 		TarArchiveInputStream tis_iterKeys = new TarArchiveInputStream(fis);
-		while(tis_iterKeys.getNextTarEntry() != null) {
+		while((in_tarEntry = tis_iterKeys.getNextTarEntry()) != null) {
 			String tarEntryName = in_tarEntry.getName();
 			if (!(tarEntryName.contains(dataReadPath) && in_tarEntry.isFile()))
 				continue;
 			else if(tarEntryName.endsWith(".xml")){
 				byte[] content = new byte[(int) in_tarEntry.getSize()];
 				int offset = 0;
-				tis.read(content, offset, content.length - offset);
+				tis_iterKeys.read(content, offset, content.length - offset);
 				String contentString = new String(content);
 				toDict.getSourceFields(contentString, keyMaster);
 			}
