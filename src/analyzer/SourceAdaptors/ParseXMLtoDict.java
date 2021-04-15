@@ -48,7 +48,7 @@ public class ParseXMLtoDict {
 				continue;
 			String nodeNameNDL = formReadable(docNode, schema);
 			String textContent = docNode.getTextContent().trim();
-			kvp.KVPextract(nodeNameNDL, textContent, dataDict);
+			kvp.KVPextractAll(nodeNameNDL, textContent, dataDict);
 		}
 	}
 	
@@ -63,7 +63,7 @@ public class ParseXMLtoDict {
 				continue;
 			String nodeNameNDL = formReadable(docNode, schema);
 			String textContent = docNode.getTextContent().trim();
-			kvp.KVPextract(nodeNameNDL, textContent, dataDict);
+			kvp.KVPextractAll(nodeNameNDL, textContent, dataDict);
 		}
 	}
 	
