@@ -24,6 +24,7 @@ public class ParseSIPCSV extends Parser {
 	CSVReader cr = null;
 	JsonParser parser = new JsonParser();
 	HashMap<String, String> deepKVP = new HashMap<String, String>();
+	KVPExtraction kvp = null;
 
 	public ParseSIPCSV(String _csvPath, String multiValueSep) throws Exception {
 		// TODO Auto-generated constructor stub
@@ -32,6 +33,7 @@ public class ParseSIPCSV extends Parser {
 		this.multiValueSep = multiValueSep;
 		cr = new CSVReader(new FileReader(_csvFile));
 		header = cr.readNext();
+		kvp = new KVPExtraction();
 //		if(!testforheader(header))
 //			throw new Exception("CSV File does not contain a header column.");
 	}
@@ -60,7 +62,7 @@ public class ParseSIPCSV extends Parser {
 					for (String eachValue : row[i].strip().split(multiValueSep))
 						field_value_list.add(eachValue);
 				for(String field_value : field_value_list) {
-					deepKVPextractKeys(field_name, field_value, keyMaster);
+					kvp.KVPextractKeys(field_name, field_value, keyMaster);
 				}
 			}
 		}

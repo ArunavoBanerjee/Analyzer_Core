@@ -67,8 +67,9 @@ public class Validator {
 					// TODO One of the most important step. Validate in details.
 					exprfieldList.put(fieldName, Data.getObject(f_prop));
 					splitexpr.add(fieldName);
-				} else if (eachexpr_norm.matches("and|or|not|\\(|\\)"))
+				} else if (eachexpr_norm.matches("and|or|not|\\(|\\)")) {
 					splitexpr.add(eachexpr_norm);
+				}
 				else {
 					ArrayList<String> f_prop = new ArrayList<String>(5);
 					f_prop.add(dataType.toLowerCase());
