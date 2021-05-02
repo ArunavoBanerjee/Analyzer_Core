@@ -84,29 +84,9 @@ public class ParseSIPCSV extends Parser {
 					field_value_list.add(row[i].strip());
 				else
 					for (String eachValue : row[i].strip().split(multiValueSep))
-						field_value_list.add(eachValue);
-				
+						field_value_list.add(eachValue);			
 				for(String field_value : field_value_list){
-					deepKVPextract(field_name, field_value);
-				if (!deepKVP.isEmpty()) {
-					for(Map.Entry<String, String> entry : deepKVP.entrySet()) {
-						if (!dataDict.containsKey(entry.getKey())) {
-							HashSet<String> values = new HashSet<String>();
-							values.add(entry.getValue().strip());
-							dataDict.put(entry.getKey(), values);
-						} else {
-							dataDict.get(entry.getKey()).add(entry.getValue().strip());
-						}
-					}
-				} else {
-					if (!dataDict.containsKey(field_name)) {
-						HashSet<String> values = new HashSet<String>();
-						values.add(field_value);
-						dataDict.put(field_name, values);
-					} else {
-						dataDict.get(field_name).add(field_value);
-					}
-				}
+					kvp.KVPextractAll(field_name, field_value, dataDict);
 			}
 			}
 		}
