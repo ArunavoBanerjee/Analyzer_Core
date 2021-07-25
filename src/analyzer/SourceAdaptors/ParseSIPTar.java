@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +38,7 @@ public class ParseSIPTar extends Parser {
 	File tarFile = null;
 	HashSet<String> parentsRead = new HashSet<String>();
 	ParseXMLtoDict toDict = new ParseXMLtoDict();
-	
+	int count = 0;
 	public ParseSIPTar(String _tarPath, String _dataReadPath) throws Exception {
 		// TODO Auto-generated constructor stub
 		dataReadPath = _dataReadPath;
@@ -48,14 +50,7 @@ public class ParseSIPTar extends Parser {
 		String tarPath = input_tar_gz.getAbsolutePath();
 		tarFile = deCompressGZipFile(input_tar_gz, new File(tarPath.replace(".gz", "")));
 		fis = new FileInputStream(tarFile);
-		tis = new TarArchiveInputStream(fis);
-//		while(tis.getNextTarEntry()!=null) {
-//		//for(int i=0;i<5;i++)
-//		if(tis.getCurrentEntry().getName().contains("/1/"))	
-//		System.out.println(tis.getCurrentEntry().getName() );
-//		}
-//		System.out.println(tis.getCurrentEntry().getName() );
-//		System.exit(0);
+		tis = new TarArchiveInputStream(fis, "UTF-8");
 	}
 	
 	public void loadKeys(ArrayList<String> keyMaster) throws Exception {

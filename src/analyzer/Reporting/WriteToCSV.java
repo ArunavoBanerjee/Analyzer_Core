@@ -3,6 +3,7 @@ package analyzer.Reporting;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -90,6 +91,8 @@ public class WriteToCSV extends CSVConfiguration {
 		cwriter = new CSVWriter(new FileWriter(csvout));
 		cwriter.writeNext(header_row);
 		cwriter.writeAll(allRows_matched);
+//		System.out.println(allRows_matched.get(0)[1]);
+//		System.out.println(System.getProperty("file.encoding"));
 		cwriter.close();
 		allRows_matched.clear();
 		file_i_matched++;

@@ -9,12 +9,15 @@ import analyzer.PatternLoader.Data;
 import analyzer.Validators.Validator;
 
 public class Evaluator {
-Validator v = null;
+	Validator v = null;
+
 	public Evaluator(Validator _v_in) {
 		this.v = _v_in;
 	}
+
 	public boolean evaluate(HashMap<String, HashSet<String>> sourceDict) {
 		Boolean writetomatch = true;
+//		System.out.println(Validator.exprfieldList);
 		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
 			boolean splitFlag = false;
 			String testField = entry.getKey();
@@ -41,21 +44,26 @@ Validator v = null;
 					v.expr.set(v.splitexpr.indexOf(entry.getKey()), String.valueOf(false));
 			}
 		}
+//		System.out.println(v.expr);
 		if (!v.splitexpr.isEmpty())
 			writetomatch = v.boolParse.evalExpr(v.expr);
 
 		return writetomatch;
 	}
-	
+
 	boolean patternMatcher(Data data, String fieldValue) {
 		for (ArrayList<String> patternClass : data.patternMap.keySet()) {
 			String dataType = patternClass.get(0);
-			if (dataType.matches("str|regx") && StrPatternMatcher.getInstance().str_matcher(fieldValue, patternClass, data.patternMap.get(patternClass)))
+			if (dataType.matches("str|regx") && StrPatternMatcher.getInstance().str_matcher(fieldValue, patternClass,
+					data.patternMap.get(patternClass)))
 				return true;
-			else if (dataType.matches("item") && ItemPatternMatcher.getInstance().item_matcher(fieldValue, patternClass, data))
+			else if (dataType.matches("item")
+					&& ItemPatternMatcher.getInstance().item_matcher(fieldValue, patternClass, data))
 				return true;
+			else if (dataType.matches("uri") && ProdDupChecker.getInstance().str_matcher(fieldValue, patternClass,
+					data.patternMap.get(patternClass)))
 		}
 		return false;
 	}
-	
+
 }

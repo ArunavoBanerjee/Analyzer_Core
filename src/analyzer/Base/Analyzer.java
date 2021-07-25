@@ -36,8 +36,8 @@ public class Analyzer {
 		File properties = new File(propPath);
 		InputStream input = new FileInputStream(properties);
 		prop.load(input);
-
-		Splitter.rootLocation = prop.getProperty("rootPath","").strip();
+		
+		Splitter.rootLocation = prop.getProperty("rootPath","").isBlank()?properties.getParent():prop.getProperty("rootPath");
 		
 		/**
 		 * Set Validator parameters and verify.

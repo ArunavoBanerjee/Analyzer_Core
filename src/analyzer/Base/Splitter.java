@@ -95,7 +95,7 @@ public class Splitter {
 				if (!dataOnly)
 					reportWriter.csvloader(parser.dataDict, writetomatch);
 				if (!isReport) {
-//					 System.out.println("----" + parser.entryMap.keySet());
+					 System.out.println("----" + parser.entryMap.keySet());
 					for (Map.Entry<String, byte[]> dataentry : parser.entryMap.entrySet()) {
 //						 if(!writetomatch)
 //						 System.out.println(writetomatch + "--" + dataentry.getKey());
