@@ -63,9 +63,9 @@ public class Validator {
 					fieldName = f_prop.remove(f_prop.size() - 1); // fieldName is not required for matchProperty validation
 					// matchProperty construct validation. {datatype:condition<optional>:case_info<optional>}. Throws java.lang.Exception if not validated. Else
 					// returns boolean result if the validation condition requires external data loading.
-					patternLoadRequired |= mpv.validateMP(f_prop);
+					patternLoadRequired = mpv.validateMP(f_prop);
 					// TODO One of the most important step. Validate in details.
-					exprfieldList.put(fieldName, Data.getObject(f_prop));
+					exprfieldList.put(fieldName, Data.getObject(f_prop, patternLoadRequired));
 					splitexpr.add(fieldName);
 				} else if (eachexpr_norm.matches("and|or|not|\\(|\\)")) {
 					splitexpr.add(eachexpr_norm);
@@ -80,7 +80,7 @@ public class Validator {
 					fieldName = eachexpr_norm;
 					mpv.validateMP(f_prop);
 					patternLoadRequired = true;
-					exprfieldList.put(fieldName, Data.getObject(f_prop));
+					exprfieldList.put(fieldName, Data.getObject(f_prop, patternLoadRequired));
 					splitexpr.add(fieldName);
 				}
 			}

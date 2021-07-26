@@ -28,7 +28,7 @@ public class Analyzer {
 		else if (reportType.equalsIgnoreCase("-r"))
 			Splitter.isReport = true;
 		else
-			throw new Exception("Splitter runType flag to be set to -d/-r.\nPlease refer documentation.");
+			throw new Exception("Splitter runType flag to be set to -d/-r.\nPlease refer Analyzer documentation.");
 		String propPath = args[1];
 		if (propPath.isEmpty())
 			throw new Exception("Properties File not set.");
