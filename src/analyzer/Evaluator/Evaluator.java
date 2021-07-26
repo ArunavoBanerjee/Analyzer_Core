@@ -62,7 +62,7 @@ public class Evaluator {
 			case "int":
 				throw new Exception("Validation with Integer dataType is currently not supported.");
 			case "uri":
-				ProdDupChecker.getInstance();
+				URIPatternMatcher.getInstance().uri_matcher(fieldValue, data.genericDefinition);
 			}
 		} else { 
 		for (ArrayList<String> patternClass : data.patternMap.keySet()) {
