@@ -1,4 +1,4 @@
-package analyzer.Evaluator;
+package analyzer.Evaluators;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ private static volatile URIPatternMatcher instance = null;
 	public boolean uri_matcher(String fieldValue, ArrayList<String> patternProp) throws Exception{
 		String matchType = patternProp.get(1);
 		switch(matchType) {
-		case "liveExists":
+		case "liveexists":
 			return ProdDupChecker.getInstance().getResult(fieldValue);
 		default:
 				throw new Exception("URI validation is currently only supported for Live Checking.\nPlease refer Analyzer Manual for more details.");

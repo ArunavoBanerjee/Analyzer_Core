@@ -35,7 +35,7 @@ import org.xml.sax.InputSource;
 
 import com.google.gson.JsonElement;
 
-import analyzer.Evaluator.Evaluator;
+import analyzer.Evaluators.Evaluator;
 import analyzer.Reporting.WriteToCSV;
 import analyzer.SourceAdaptors.Parser;
 import analyzer.SourceAdaptors.SourceParserFactory;

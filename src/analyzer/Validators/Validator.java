@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import analyzer.Evaluator.BooleanParser;
+import analyzer.Evaluators.BooleanParser;
 import analyzer.PatternLoader.Data;
 import analyzer.PatternLoader.LoadPatterns;
 

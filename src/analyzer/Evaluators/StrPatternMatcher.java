@@ -1,4 +1,4 @@
-package analyzer.Evaluator;
+package analyzer.Evaluators;
 
 import java.util.ArrayList;
 import java.util.HashSet;
