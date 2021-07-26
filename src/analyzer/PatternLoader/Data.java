@@ -12,10 +12,11 @@ public class Data {
 	public HashSet<String> dupSet = new HashSet<String>();
 	public ArrayList<String> genericDefinition;
 
-	private Data(ArrayList<String> patternproperties, Boolean emptyPattern) {
+	private Data(ArrayList<String> patternproperties, Boolean emptyPattern, boolean patternLoadRequired) {
 		if (!emptyPattern) {
 			this.genericDefinition = patternproperties;
-			this.patternMap.put(patternproperties, new HashSet<String>());
+			if(patternLoadRequired)
+				this.patternMap.put(patternproperties, new HashSet<String>());
 		}
 	}
 /**
@@ -23,7 +24,7 @@ public class Data {
  * @param patternproperties
  * @return
  */
-	public static Data getObject(ArrayList<String> patternproperties) {
+	public static Data getObject(ArrayList<String> patternproperties, boolean patternLoadRequired) {
 		Boolean emptyPattern = true;
 		for (String value : patternproperties)
 			if (!value.isBlank()) {
@@ -33,7 +34,7 @@ public class Data {
 		if (patternproperties.get(0).equals("item") && patternproperties.get(1).equals("exists"))
 			return nullObject;
 		else
-			return new Data(patternproperties, emptyPattern);
+			return new Data(patternproperties, emptyPattern, patternLoadRequired);
 	}
 
 	public void loadConstPatterns(String data) throws Exception {

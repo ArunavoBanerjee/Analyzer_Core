@@ -15,7 +15,7 @@ public class Evaluator {
 		this.v = _v_in;
 	}
 
-	public boolean evaluate(HashMap<String, HashSet<String>> sourceDict) {
+	public boolean evaluate(HashMap<String, HashSet<String>> sourceDict) throws Exception{
 		Boolean writetomatch = true;
 //		System.out.println(Validator.exprfieldList);
 		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
@@ -51,7 +51,20 @@ public class Evaluator {
 		return writetomatch;
 	}
 
-	boolean patternMatcher(Data data, String fieldValue) {
+	boolean patternMatcher(Data data, String fieldValue) throws Exception{
+		if(data.patternMap.isEmpty()) {
+			String dataType = data.genericDefinition.get(0);
+			switch(dataType) {
+			case "str":
+				throw new Exception("Pattern Loading Required for String dataType validation.");
+			case "regx":
+				throw new Exception("Pattern Loading Required for Regular Expression(regx) dataType validation.");
+			case "int":
+				throw new Exception("Validation with Integer dataType is currently not supported.");
+			case "uri":
+				ProdDupChecker.getInstance();
+			}
+		} else { 
 		for (ArrayList<String> patternClass : data.patternMap.keySet()) {
 			String dataType = patternClass.get(0);
 			if (dataType.matches("str|regx") && StrPatternMatcher.getInstance().str_matcher(fieldValue, patternClass,
@@ -60,9 +73,8 @@ public class Evaluator {
 			else if (dataType.matches("item")
 					&& ItemPatternMatcher.getInstance().item_matcher(fieldValue, patternClass, data))
 				return true;
-			else if (dataType.matches("uri") && ProdDupChecker.getInstance().str_matcher(fieldValue, patternClass,
-					data.patternMap.get(patternClass)))
 		}
+	}
 		return false;
 	}
 
