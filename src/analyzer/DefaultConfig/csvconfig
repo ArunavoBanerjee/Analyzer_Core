@@ -1,4 +1,4 @@
 rowlimit=50000
 multivalue_seperator=;
 #fieldList=dc.description
-ID=handle_ID
+ID=Handle_ID

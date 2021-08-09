@@ -2,93 +2,127 @@ package analyzer.SourceAdaptors;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.opencsv.CSVReader;
 
 /**
  * XLSX input data parser. WIP
- * @author ndl
+ * @author arunavo.banerjee.cse16@gmail.com
  *
  */
 
 public class ParseSIPXLSX extends Parser {
-
-	String _csvName = "";
-	String[] header = null;
-	CSVReader cr = null;
-	public ParseSIPXLSX(String _csvPath) throws Exception {
+	String _xlsxName = "", multiValueSep = "";
+	static ArrayList<String> header = new ArrayList<String>();
+	Sheet xlsxDataSheet = null;
+	Iterator<Row> allRows = null;
+	KVPExtraction kvp = null;
+	DataFormatter formatter = new DataFormatter();
+	Row row = null;
+	int row_index = 0;
+	
+	public ParseSIPXLSX(String _xlsxPath, String muliValueSep) throws Exception {
 		// TODO Auto-generated constructor stub
-		File _csvFile = new File(_csvPath);
-		_csvName = _csvFile.getName();
-		cr = new CSVReader(new FileReader(_csvFile));
-		header = cr.readNext();
+		File _xlsxFile = new File(_xlsxPath);
+		_xlsxName = _xlsxFile.getName();
+		this.multiValueSep = muliValueSep;
+		Workbook xlsxData = new XSSFWorkbook(new FileInputStream(_xlsxFile));
+		xlsxDataSheet = xlsxData.getSheetAt(0);
+		allRows = xlsxDataSheet.iterator();
+		allRows.next();
+		xlsxData.close();
+		kvp = new KVPExtraction();
 //		if(!testforheader(header))
 //			throw new Exception("CSV File does not contain a header column.");
 	}
 	
 	public String getSourceName() {
-		return _csvName;
+		return _xlsxName;
 	}
 	
 	public boolean clean() throws Exception{
-		cr.close();
 		return true;
 	}
 
+	public void loadKeys(ArrayList<String> keyMaster) throws Exception {
+		try {
+			Iterator<Row> allRows = xlsxDataSheet.iterator();
+			while (allRows.hasNext()) {
+				Row thisrow = allRows.next();
+				for (Cell eachColumn : thisrow) {
+					if (eachColumn.getCellType() == CellType.FORMULA)
+						throw new Exception("Data File header cannot have formula.");
+					if (formatter.formatCellValue(eachColumn).strip().isBlank())
+						throw new Exception("Data File header can not be empty.");
+					header.add(formatter.formatCellValue(eachColumn).strip());
+				}
+				break;
+			}
+		while (allRows.hasNext()) {
+			Row thisrow = allRows.next();
+			int i = 0;
+			for (Cell eachColumn : thisrow) {
+				String cellValue = formatter.formatCellValue(eachColumn).strip();
+				String field_name = header.get(i).strip();
+				keyMaster.add(field_name);
+				HashSet<String> field_value_list = new HashSet<String>();
+				if(multiValueSep.isBlank())
+					field_value_list.add(cellValue);
+				else
+					for (String eachValue : cellValue.split(multiValueSep))
+						field_value_list.add(eachValue.strip());
+				for(String field_value : field_value_list) {
+					kvp.KVPextractKeys(field_name, field_value, keyMaster);
+				}
+				i++;
+			}
+		}
+		} catch (NoSuchElementException e) {
+			throw e;
+		} catch(Exception e) {
+			throw e;
+		}
+	}
 
 	public boolean next() throws Exception {
 		dataDict.clear();
 		boolean nextExists = false;
-		String [] row = null;
-		while((row = cr.readNext()) != null) {
+		Row thisrow = null;
+		try { 
+		if ((thisrow = allRows.next()) != null) {
+			int i = 0;
 			nextExists = true;
-			for(int i = 0; i < row.length; i++) {
-				if(row[i].isBlank())
-					continue;
-				String field_name = header[i].strip();
-				if(!dataDict.containsKey(field_name)) {
-					HashSet<String> values = new HashSet<String>();
-					for(String eachValue : row[i].strip().split(";"))
-						values.add(eachValue);
-					dataDict.put(field_name,values);
-				} else {
-					for(String eachValue : row[i].strip().split(";"))
-						dataDict.get(field_name).add(eachValue);
-				}
+			for (Cell eachColumn : thisrow) {
+				String cellValue = formatter.formatCellValue(eachColumn).strip();
+				String field_name = header.get(i).strip();
+				HashSet<String> field_value_list = new HashSet<String>();
+				if(multiValueSep.isBlank())
+					field_value_list.add(cellValue);
+				else
+					for (String eachValue : cellValue.split(multiValueSep))
+						field_value_list.add(eachValue.strip());			
+				for(String field_value : field_value_list){
+					kvp.KVPextractAll(field_name, field_value, dataDict);
+			}
+				i++;
 			}
 		}
-		//System.out.println(dataDict);
+	} catch (NoSuchElementException e) {
+		// System.out.println(dataDict);
+	}
 		return nextExists;
 	}
-	
-	public void loadKeys(ArrayList<String> keyMaster) throws Exception {
-		
-	}
-	
-	
 }

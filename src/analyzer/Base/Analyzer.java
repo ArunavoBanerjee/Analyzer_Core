@@ -17,27 +17,22 @@ import analyzer.Validators.Validator;
  */
 public class Analyzer {
 
-	static Scanner in = new Scanner(System.in);
 
-	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
-		long time = System.currentTimeMillis();
-		String reportType = args[0];
-		if (reportType.equalsIgnoreCase("-d"))
+	static Scanner in = new Scanner(System.in);
+	
+	public void runAnalysis(String runType, File runProperties) throws Exception{
+		
+		if (runType.equalsIgnoreCase("-d"))
 			Splitter.isReport = false;
-		else if (reportType.equalsIgnoreCase("-r"))
+		else if (runType.equalsIgnoreCase("-r"))
 			Splitter.isReport = true;
 		else
 			throw new Exception("Splitter runType flag to be set to -d/-r.\nPlease refer Analyzer documentation.");
-		String propPath = args[1];
-		if (propPath.isEmpty())
-			throw new Exception("Properties File not set.");
 		Properties prop = new Properties();
-		File properties = new File(propPath);
-		InputStream input = new FileInputStream(properties);
+		InputStream input = new FileInputStream(runProperties);
 		prop.load(input);
 		
-		Splitter.rootLocation = prop.getProperty("rootPath","").isBlank()?properties.getParent():prop.getProperty("rootPath");
+		Splitter.rootLocation = prop.getProperty("rootPath","").isBlank()?runProperties.getParent():prop.getProperty("rootPath");
 		
 		/**
 		 * Set Validator parameters and verify.
@@ -63,11 +58,12 @@ public class Analyzer {
 			Validator.splitlistPath = Splitter.rootLocation+"/"+prop.getProperty("splitListFile").strip();
 		}
 		Validator new_validator = null;
-		if (!(reportType.equals("-r") && Validator.expr_str.isBlank())) {
+		if (!(runType.equals("-r") && Validator.expr_str.isBlank())) {
 			new_validator = new Validator();
 		}
 
 		Splitter.sourceList = prop.getProperty("sourceFile").split(",");
+		if(prop.getProperty("csvMultivalueSep") != null)
 		Splitter.csvMultivalueSep = prop.getProperty("csvMultivalueSep","||").strip();
 		if (prop.getProperty("targetFileMatched") != null)
 			Splitter.dest_matched = Splitter.rootLocation + "/" + prop.getProperty("targetFileMatched").strip();
@@ -98,6 +94,7 @@ public class Analyzer {
 		if (prop.getProperty("csvConfigPath") != null)
 			Splitter.csvconfigPath = Splitter.rootLocation + "/" + prop.getProperty("csvConfigPath");
 
+		long time = System.currentTimeMillis();
 		Splitter newSplit = new Splitter(new_validator);
 		newSplit.churnData();
 
@@ -112,6 +109,17 @@ public class Analyzer {
 			System.out.println("Total Processing Time " + Math.round(elapsed_min) + " mins "
 					+ Math.round(elapsed_sec * 100) / 100 + " seconds.");
 		}
+	}
+
+	public static void main(String[] args) throws Exception {
+		// TODO Auto-generated method stub
+		String reportType = args[0];
+		String propPath = args[1];
+		if (propPath.isEmpty())
+			throw new Exception("Properties File not set.");
+		Analyzer analyzer = new Analyzer();
+		analyzer.runAnalysis(reportType, new File(propPath));
+
 	}
 
 	/**

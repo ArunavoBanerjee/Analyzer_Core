@@ -1,29 +1,22 @@
 package analyzer.SourceAdaptors;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.opencsv.CSVReader;
+
+/**
+ * CSV input data parser.
+ * @author arunavo.banerjee.cse16@gmail.com
+ *
+ */
 
 public class ParseSIPCSV extends Parser {
 
 	String _csvName = "", multiValueSep = "";
 	String[] header = null;
 	CSVReader cr = null;
-	JsonParser parser = new JsonParser();
-	HashMap<String, String> deepKVP = new HashMap<String, String>();
 	KVPExtraction kvp = null;
 
 	public ParseSIPCSV(String _csvPath, String multiValueSep) throws Exception {
@@ -92,33 +85,5 @@ public class ParseSIPCSV extends Parser {
 		}
 		// System.out.println(dataDict);
 		return nextExists;
-	}
-
-	HashMap<String, String> deepKVPextract(String field, String value) {
-		deepKVP.clear();
-		//System.out.println(value);
-		try {
-		JsonObject jsonObject = parser.parse(value).getAsJsonObject();
-		for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-			String extendedField = field + "@" + entry.getKey();
-			String textContent = entry.getValue().getAsString();
-			deepKVP.put(extendedField, textContent);
-		}
-		} catch (Exception e) {
-			
-		}
-		return deepKVP;
-	}
-	void deepKVPextractKeys(String field, String value, ArrayList<String> deepKeys) {
-		//System.out.println(value);
-		try {
-		JsonObject jsonObject = parser.parse(value).getAsJsonObject();
-		for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-			String extendedField = field + "@" + entry.getKey();
-			deepKeys.add(extendedField);
-		}
-		} catch (Exception e) {
-			
-		}
 	}
 }

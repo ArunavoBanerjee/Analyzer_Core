@@ -271,7 +271,7 @@
     "multiValued": false,
     "controled": false
   },
-  "dc.subject.other": {
+  "dc.subject.other@jel": {
     "datatype": "text",
     "multiValued": true,
     "controled": false

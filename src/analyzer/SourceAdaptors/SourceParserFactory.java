@@ -67,6 +67,8 @@ public class SourceParserFactory {
 			return new ParseSIPDir(sourcePath);
 		else if (sourcePath.endsWith(".csv"))
 			return new ParseSIPCSV(sourcePath, csvMultivalueSep);
+		else if (sourcePath.endsWith(".xlsx"))
+			return new ParseSIPXLSX(sourcePath, csvMultivalueSep);
 		else
 			return null;
 			
