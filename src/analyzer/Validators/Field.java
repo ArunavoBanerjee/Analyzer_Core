@@ -14,4 +14,12 @@ public class Field {
 		this.fieldName = fieldName;
 		this.patternIndexPos = indexPos;
 	}
+	
+	public String getField() {
+		return fieldName;
+	}
+	
+	public int getPOS() {
+		return patternIndexPos;
+	}
 }
