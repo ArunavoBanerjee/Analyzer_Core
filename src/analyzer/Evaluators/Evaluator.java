@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import analyzer.PatternLoader.Data;
+import analyzer.Validators.Field;
 import analyzer.Validators.Validator;
 
 public class Evaluator {
@@ -15,12 +16,11 @@ public class Evaluator {
 		this.v = _v_in;
 	}
 
-	public boolean evaluate(HashMap<String, HashSet<String>> sourceDict) throws Exception{
+	public boolean evaluate(HashMap<String, HashSet<String>> sourceDict) throws Exception {
 		Boolean writetomatch = true;
-		System.out.println(Validator.exprfieldList);
-		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
+		for (Map.Entry<Field, Data> entry : Validator.exprfieldList.entrySet()) {
 			boolean splitFlag = false;
-			String testField = entry.getKey();
+			String testField = entry.getKey().getField();
 			Data testCondition = entry.getValue();
 			if (sourceDict.containsKey(testField)) {
 				if (testCondition == null)
