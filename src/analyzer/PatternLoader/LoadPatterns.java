@@ -22,6 +22,7 @@ import com.opencsv.CSVReader;
 import analyzer.CustomException.DataFormatException;
 import analyzer.CustomException.DataStructureException;
 import analyzer.Validators.DataValidator;
+import analyzer.Validators.Field;
 import analyzer.Validators.MatchPropValidator;
 import analyzer.Validators.Validator;
 
@@ -64,7 +65,7 @@ public class LoadPatterns {
 		}
 		for (String keys : distinctID.keySet())
 			splitID.add(keys);
-		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
+		for (Map.Entry<Field, Data> entry : Validator.exprfieldList.entrySet()) {
 			if (!(entry.getValue() == null || splitID.contains(entry.getKey())))
 				throw new Exception("Expression field " + entry.getKey() + " is not contained in filterdata. No Split performed.");
 		}
@@ -119,7 +120,7 @@ public class LoadPatterns {
 		}
 		for (String keys : distinctID.keySet())
 			splitID.add(keys);
-		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
+		for (Map.Entry<Field, Data> entry : Validator.exprfieldList.entrySet()) {
 			if (!(entry.getValue() == null || splitID.contains(entry.getKey())))
 				throw new Exception("Expression field '" + entry.getKey() + "' not contained in filterdata. No Split performed.");
 		}

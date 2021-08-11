@@ -24,7 +24,7 @@ import analyzer.PatternLoader.LoadPatterns;
  */
 public class Validator {
 	public static String dataType = "", matchType = "", matchCase = "", left_token = "", right_token = "", expr_str = "", splitlistPath = "";
-	public static HashMap<String, Data> exprfieldList = new HashMap<String, Data>();
+	public static HashMap<Field, Data> exprfieldList = new HashMap<Field, Data>();
 	List<String> splitexpr_input = new ArrayList<String>();
 	public List<String> splitexpr = new ArrayList<String>();
 	public ArrayList<String> expr = new ArrayList<String>();
@@ -41,7 +41,7 @@ public class Validator {
 				loadSplitList();
 		}
 	}
-
+	
 	/**
 	 * Parsing and validating split expression. The method parse the text form of the split-expression and segments it to matchProperty
 	 * structure. Each segments are then passed through the validation method {@link analyzer.Validators.MatchPropValidator#validateMP}.
@@ -64,8 +64,8 @@ public class Validator {
 					// matchProperty construct validation. {datatype:condition<optional>:case_info<optional>}. Throws java.lang.Exception if not validated. Else
 					// returns boolean result if the validation condition requires external data loading.
 					patternLoadRequired = mpv.validateMP(f_prop);
-					// TODO One of the most important step. Validate in details.
-					exprfieldList.put(fieldName, Data.getObject(f_prop, patternLoadRequired));
+					// TODO One of the most important step. Validate in details.					
+					exprfieldList.put(new Field(fieldName), Data.getObject(f_prop, patternLoadRequired));
 					splitexpr.add(fieldName);
 				} else if (eachexpr_norm.matches("and|or|not|\\(|\\)")) {
 					splitexpr.add(eachexpr_norm);
@@ -80,7 +80,7 @@ public class Validator {
 					fieldName = eachexpr_norm;
 					mpv.validateMP(f_prop);
 					patternLoadRequired = true;
-					exprfieldList.put(fieldName, Data.getObject(f_prop, patternLoadRequired));
+					exprfieldList.put(new Field(fieldName), Data.getObject(f_prop, patternLoadRequired));
 					splitexpr.add(fieldName);
 				}
 			}
