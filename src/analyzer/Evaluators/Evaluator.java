@@ -17,7 +17,7 @@ public class Evaluator {
 
 	public boolean evaluate(HashMap<String, HashSet<String>> sourceDict) throws Exception{
 		Boolean writetomatch = true;
-//		System.out.println(Validator.exprfieldList);
+		System.out.println(Validator.exprfieldList);
 		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
 			boolean splitFlag = false;
 			String testField = entry.getKey();

@@ -19,7 +19,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.opencsv.CSVReader;
 
 /**
- * XLSX input data parser. WIP
+ * XLSX input data parser.
  * @author arunavo.banerjee.cse16@gmail.com
  *
  */
@@ -77,7 +77,6 @@ public class ParseSIPXLSX extends Parser {
 			for (Cell eachColumn : thisrow) {
 				String cellValue = formatter.formatCellValue(eachColumn).strip();
 				String field_name = header.get(i).strip();
-				keyMaster.add(field_name);
 				HashSet<String> field_value_list = new HashSet<String>();
 				if(multiValueSep.isBlank())
 					field_value_list.add(cellValue);

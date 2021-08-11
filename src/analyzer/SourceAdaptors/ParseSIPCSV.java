@@ -47,7 +47,7 @@ public class ParseSIPCSV extends Parser {
 				if(row[i].isBlank())
 					continue;
 				String field_name = header[i].strip();
-				keyMaster.add(field_name);
+//				keyMaster.add(field_name);
 				HashSet<String> field_value_list = new HashSet<String>();
 				if(multiValueSep.isBlank())
 					field_value_list.add(row[i].strip());

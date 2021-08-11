@@ -128,7 +128,7 @@ public class Analyzer {
 	 * @param new_validator
 	 * @throws Exception
 	 */
-	static void validate_input_conditions(Validator new_validator) throws Exception {
+	void validate_input_conditions(Validator new_validator) throws Exception {
 		if (Splitter.isReport) {
 			if (Splitter.dest_matched.isEmpty() && Splitter.dest_unmatched.isEmpty() && Splitter.reportDest.isEmpty()) {
 				throw new Exception("Report destinations mandatory for -r Flag.");
