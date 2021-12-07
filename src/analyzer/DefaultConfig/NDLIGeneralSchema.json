@@ -121,6 +121,11 @@
     "multiValued": false,
     "controled": false
   },
+  "dc.identifier.other@lccn": {
+    "datatype": "text",
+    "multiValued": false,
+    "controled": false
+  },
   "dc.subject.ddc": {
     "datatype": "ddc",
     "multiValued": true,
@@ -272,6 +277,11 @@
     "controled": false
   },
   "dc.subject.other@jel": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.subject.other@ccl": {
     "datatype": "text",
     "multiValued": true,
     "controled": false

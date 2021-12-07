@@ -24,7 +24,8 @@ import analyzer.PatternLoader.LoadPatterns;
  */
 public class Validator {
 	public static String dataType = "", matchType = "", matchCase = "", left_token = "", right_token = "", expr_str = "", splitlistPath = "";
-	public static HashMap<Field, Data> exprfieldList = new HashMap<Field, Data>();
+//	public static HashMap<Field, Data> exprfieldList = new HashMap<Field, Data>();
+	public static HashMap<String, Data> exprfieldList = new HashMap<String, Data>();
 	List<String> splitexpr_input = new ArrayList<String>();
 	public List<String> splitexpr = new ArrayList<String>();
 	public ArrayList<String> expr = new ArrayList<String>();
@@ -65,7 +66,8 @@ public class Validator {
 					// returns boolean result if the validation condition requires external data loading.
 					patternLoadRequired = mpv.validateMP(f_prop);
 					// TODO One of the most important step. Validate in details.					
-					exprfieldList.put(new Field(fieldName), Data.getObject(f_prop, patternLoadRequired));
+//					exprfieldList.put(new Field(fieldName), Data.getObject(f_prop, patternLoadRequired));
+					exprfieldList.put(fieldName, Data.getObject(f_prop, patternLoadRequired));
 					splitexpr.add(fieldName);
 				} else if (eachexpr_norm.matches("and|or|not|\\(|\\)")) {
 					splitexpr.add(eachexpr_norm);
@@ -80,7 +82,8 @@ public class Validator {
 					fieldName = eachexpr_norm;
 					mpv.validateMP(f_prop);
 					patternLoadRequired = true;
-					exprfieldList.put(new Field(fieldName), Data.getObject(f_prop, patternLoadRequired));
+//					exprfieldList.put(new Field(fieldName), Data.getObject(f_prop, patternLoadRequired));
+					exprfieldList.put(fieldName, Data.getObject(f_prop, patternLoadRequired));
 					splitexpr.add(fieldName);
 				}
 			}

@@ -18,9 +18,10 @@ public class Evaluator {
 
 	public boolean evaluate(HashMap<String, HashSet<String>> sourceDict) throws Exception {
 		Boolean writetomatch = true;
-		for (Map.Entry<Field, Data> entry : Validator.exprfieldList.entrySet()) {
+		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
 			boolean splitFlag = false;
-			String testField = entry.getKey().getField();
+//			String testField = entry.getKey().getField();
+			String testField = entry.getKey();
 			Data testCondition = entry.getValue();
 			if (sourceDict.containsKey(testField)) {
 				if (testCondition == null)
@@ -39,9 +40,9 @@ public class Evaluator {
 			if (!v.splitexpr.isEmpty()) {
 				// System.out.println(expr+""+splitexpr+entry.getKey());
 				if (splitFlag) {
-					v.expr.set(v.splitexpr.indexOf(entry.getKey()), String.valueOf(true));
+					v.expr.set(v.splitexpr.indexOf(testField), String.valueOf(true));
 				} else
-					v.expr.set(v.splitexpr.indexOf(entry.getKey()), String.valueOf(false));
+					v.expr.set(v.splitexpr.indexOf(testField), String.valueOf(false));
 			}
 		}
 //		System.out.println(v.expr);
@@ -52,6 +53,7 @@ public class Evaluator {
 	}
 
 	boolean patternMatcher(Data data, String fieldValue) throws Exception{
+//		System.out.println(data.patternMap);
 		if(data.patternMap.isEmpty()) {
 			String dataType = data.genericDefinition.get(0);
 			switch(dataType) {

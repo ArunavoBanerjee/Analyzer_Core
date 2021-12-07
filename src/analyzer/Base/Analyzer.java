@@ -17,7 +17,6 @@ import analyzer.Validators.Validator;
  */
 public class Analyzer {
 
-
 	static Scanner in = new Scanner(System.in);
 	
 	public void runAnalysis(String runType, File runProperties) throws Exception{
@@ -32,7 +31,7 @@ public class Analyzer {
 		InputStream input = new FileInputStream(runProperties);
 		prop.load(input);
 		
-		Splitter.rootLocation = prop.getProperty("rootPath","").isBlank()?runProperties.getParent():prop.getProperty("rootPath");
+		Splitter.rootLocation = prop.getProperty("rootPath","").isBlank() ? runProperties.getParent() : prop.getProperty("rootPath");
 		
 		/**
 		 * Set Validator parameters and verify.

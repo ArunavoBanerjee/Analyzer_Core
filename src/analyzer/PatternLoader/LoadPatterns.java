@@ -65,8 +65,10 @@ public class LoadPatterns {
 		}
 		for (String keys : distinctID.keySet())
 			splitID.add(keys);
-		for (Map.Entry<Field, Data> entry : Validator.exprfieldList.entrySet()) {
-			if (!(entry.getValue() == null || splitID.contains(entry.getKey())))
+		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
+//			String testField = entry.getKey().getField();
+			String testField = entry.getKey();
+			if (!(entry.getValue() == null || splitID.contains(testField)))
 				throw new Exception("Expression field " + entry.getKey() + " is not contained in filterdata. No Split performed.");
 		}
 		for (String eachID : splitID)
@@ -120,9 +122,11 @@ public class LoadPatterns {
 		}
 		for (String keys : distinctID.keySet())
 			splitID.add(keys);
-		for (Map.Entry<Field, Data> entry : Validator.exprfieldList.entrySet()) {
-			if (!(entry.getValue() == null || splitID.contains(entry.getKey())))
-				throw new Exception("Expression field '" + entry.getKey() + "' not contained in filterdata. No Split performed.");
+		for (Map.Entry<String, Data> entry : Validator.exprfieldList.entrySet()) {
+//			String testField = entry.getKey().getField();
+			String testField = entry.getKey();
+			if (!(entry.getValue() == null || splitID.contains(testField)))
+				throw new Exception("Expression field '" + testField + "' not contained in filterdata. No Split performed.");
 		}
 		List<String[]> allRows = new ArrayList<String[]>();
 		while (eachrow.hasNext()) {
