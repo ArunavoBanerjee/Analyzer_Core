@@ -65,9 +65,9 @@ public class Analyzer {
 		if(prop.getProperty("csvMultivalueSep") != null)
 		Splitter.csvMultivalueSep = prop.getProperty("csvMultivalueSep","||").strip();
 		if (prop.getProperty("MatchedData") != null)
-			Splitter.dest_matched = Splitter.rootLocation + "/" + prop.getProperty("targetFileMatched").strip();
+			Splitter.dest_matched = Splitter.rootLocation + "/" + prop.getProperty("MatchedData").strip();
 		if (prop.getProperty("UnMatchedData") != null)
-			Splitter.dest_unmatched = Splitter.rootLocation + "/" + prop.getProperty("targetFileUnMatched").strip();
+			Splitter.dest_unmatched = Splitter.rootLocation + "/" + prop.getProperty("UnMatchedData").strip();
 		if (prop.getProperty("reportDestination") != null)
 			Splitter.reportDest = Splitter.rootLocation + "/" + prop.getProperty("reportDestination").strip();
 		if (prop.getProperty("keepSourceHier") != null)
