@@ -1,4 +1,4 @@
-package analyzer.Evaluators;
+package analyzer.Base;
 
 import java.util.ArrayList;
 

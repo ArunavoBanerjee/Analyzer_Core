@@ -4,14 +4,15 @@ import java.util.ArrayList;
 
 public class DataValidator {
 	String data;
-	ArrayList<String> matchProp; 
+	ArrayList<String> matchProp;
+	
 	public String validateData(ArrayList<String> matchProp_in, String data_in) throws Exception{
 		data = data_in;
 		matchProp = matchProp_in;
 		String dataType = matchProp_in.get(0);
 		if (dataType.equalsIgnoreCase("str"))
 			strValidator();
-		else if (dataType.equalsIgnoreCase("regx"))
+		else if (dataType.equalsIgnoreCase("regex"))
 			strValidator();
 		else if (dataType.equals("int"))
 			intValidator();

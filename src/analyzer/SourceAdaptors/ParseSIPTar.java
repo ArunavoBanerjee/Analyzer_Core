@@ -66,6 +66,13 @@ public class ParseSIPTar extends Parser {
 				String contentString = new String(content);
 				toDict.getSourceFields(contentString, keyMaster);
 			}
+			else if(tarEntryName.equals("contents")){
+				byte[] content = new byte[(int) in_tarEntry.getSize()];
+				int offset = 0;
+				tis_iterKeys.read(content, offset, content.length - offset);
+				String contentString = new String(content);
+				toDict.getSourceFields(contentString, keyMaster);
+			}
 		}
 		tis_iterKeys.close();
 	}

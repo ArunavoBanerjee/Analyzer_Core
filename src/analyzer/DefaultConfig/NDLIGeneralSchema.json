@@ -290,5 +290,15 @@
     "datatype": "text",
     "multiValued": true,
     "controled": false
+  },
+  "dc.relation.haspart": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
+  },
+  "dc.relation.ispartof": {
+    "datatype": "text",
+    "multiValued": true,
+    "controled": false
   }
 }

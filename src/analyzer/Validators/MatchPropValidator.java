@@ -20,8 +20,8 @@ public class MatchPropValidator {
 			if (dataType.equalsIgnoreCase("str")) {
 				str_mpValidator();
 				return true;
-			} else if (dataType.equalsIgnoreCase("regx")) {
-				regx_mpValidator();
+			} else if (dataType.equalsIgnoreCase("regex")) {
+				regex_mpValidator();
 				return true;
 			} else if (dataType.equalsIgnoreCase("int")) {
 				int_mpValidator();
@@ -88,7 +88,7 @@ public class MatchPropValidator {
 		}
 	}
 	
-	void regx_mpValidator() throws Exception {
+	void regex_mpValidator() throws Exception {
 		switch(matchType) {
 		case "equals":
 		case "startswith":
@@ -132,6 +132,9 @@ public class MatchPropValidator {
 
 	void uri_mpValidator() throws Exception {
 		if (matchType.equalsIgnoreCase("liveExists")) {
+			matchProp.set(0, dataType.toLowerCase());
+			matchProp.set(1, matchType.toLowerCase());	
+		} else if (matchType.equalsIgnoreCase("URIExists")) {
 			matchProp.set(0, dataType.toLowerCase());
 			matchProp.set(1, matchType.toLowerCase());	
 		} else {

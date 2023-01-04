@@ -19,23 +19,16 @@ public class Analyzer {
 
 	static Scanner in = new Scanner(System.in);
 	
-	public void runAnalysis(String runType, File runProperties) throws Exception{
-		
+	public void runAnalysis(String runType, Properties prop, String propLocation) throws Exception{
+		/**
+		 * Set Validator parameters and verify.
+		 */
 		if (runType.equalsIgnoreCase("-d"))
 			Splitter.isReport = false;
 		else if (runType.equalsIgnoreCase("-r"))
 			Splitter.isReport = true;
-		else
-			throw new Exception("Splitter runType flag to be set to -d/-r.\nPlease refer Analyzer documentation.");
-		Properties prop = new Properties();
-		InputStream input = new FileInputStream(runProperties);
-		prop.load(input);
 		
-		Splitter.rootLocation = prop.getProperty("rootPath","").isBlank() ? runProperties.getParent() : prop.getProperty("rootPath");
-		
-		/**
-		 * Set Validator parameters and verify.
-		 */
+		Splitter.rootLocation = prop.getProperty("rootPath","").isBlank() ? propLocation : prop.getProperty("rootPath");
 		if (prop.getProperty("dataType") != null)
 			Validator.dataType = prop.getProperty("dataType").strip();
 		if (prop.getProperty("matchType") != null)
@@ -61,7 +54,7 @@ public class Analyzer {
 			new_validator = new Validator();
 		}
 
-		Splitter.sourceList = prop.getProperty("sourceFile").split(",");
+		Splitter.sourceList = prop.getProperty("sourceData").split(",");
 		if(prop.getProperty("csvMultivalueSep") != null)
 		Splitter.csvMultivalueSep = prop.getProperty("csvMultivalueSep","||").strip();
 		if (prop.getProperty("MatchedData") != null)
@@ -116,8 +109,15 @@ public class Analyzer {
 		String propPath = args[1];
 		if (propPath.isEmpty())
 			throw new Exception("Properties File not set.");
+		
+		if (!(reportType.equalsIgnoreCase("-d")||reportType.equalsIgnoreCase("-r")))
+			throw new Exception("Splitter runType flag to be set to -d/-r.\nPlease refer Analyzer documentation.");
+		
+		Properties prop = new Properties();
+		InputStream input = new FileInputStream(propPath);
+		prop.load(input);
 		Analyzer analyzer = new Analyzer();
-		analyzer.runAnalysis(reportType, new File(propPath));
+		analyzer.runAnalysis(reportType, prop, new File(propPath).getParent());
 
 	}
 

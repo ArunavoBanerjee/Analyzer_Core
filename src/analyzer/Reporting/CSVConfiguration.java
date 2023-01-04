@@ -33,8 +33,10 @@ public class CSVConfiguration {
 				throw new Exception("param multivalue_seperator missing in CSV config.");
 			else
 				multivalue_seperator = prop.getProperty("multivalue_seperator");
-			if (prop.getProperty("fieldList") != null)
-				field_to_write.addAll(Arrays.asList(prop.getProperty("fieldList").split(",")));
+			if (prop.getProperty("fieldList") != null) {
+				String fieldList = prop.getProperty("fieldList").replaceAll(",\s*", ",");
+				field_to_write.addAll(Arrays.asList(fieldList.split(",")));
+			}
 			if (prop.getProperty("ID") != null)
 				ID=prop.getProperty("ID");
 			else {

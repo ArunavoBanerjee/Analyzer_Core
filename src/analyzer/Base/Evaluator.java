@@ -1,4 +1,4 @@
-package analyzer.Evaluators;
+package analyzer.Base;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public class Evaluator {
 				}
 			}
 			if (!v.splitexpr.isEmpty()) {
-				// System.out.println(expr+""+splitexpr+entry.getKey());
+//				 System.out.println(v.expr+""+v.splitexpr+entry.getKey());
 				if (splitFlag) {
 					v.expr.set(v.splitexpr.indexOf(testField), String.valueOf(true));
 				} else
@@ -52,24 +52,24 @@ public class Evaluator {
 		return writetomatch;
 	}
 
-	boolean patternMatcher(Data data, String fieldValue) throws Exception{
+	boolean patternMatcher(Data data, String fieldValue) throws Exception {
 //		System.out.println(data.patternMap);
 		if(data.patternMap.isEmpty()) {
 			String dataType = data.genericDefinition.get(0);
 			switch(dataType) {
 			case "str":
 				throw new Exception("Pattern Loading Required for String dataType validation.");
-			case "regx":
+			case "regex":
 				throw new Exception("Pattern Loading Required for Regular Expression(regx) dataType validation.");
 			case "int":
 				throw new Exception("Validation with Integer dataType is currently not supported.");
 			case "uri":
-				URIPatternMatcher.getInstance().uri_matcher(fieldValue, data.genericDefinition);
+				return URIPatternMatcher.getInstance().uri_matcher(fieldValue, data.genericDefinition);
 			}
 		} else { 
 		for (ArrayList<String> patternClass : data.patternMap.keySet()) {
 			String dataType = patternClass.get(0);
-			if (dataType.matches("str|regx") && StrPatternMatcher.getInstance().str_matcher(fieldValue, patternClass,
+			if (dataType.matches("str|regex") && StrPatternMatcher.getInstance().str_matcher(fieldValue, patternClass,
 					data.patternMap.get(patternClass)))
 				return true;
 			else if (dataType.matches("item")

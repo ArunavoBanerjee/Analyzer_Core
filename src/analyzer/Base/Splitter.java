@@ -35,7 +35,6 @@ import org.xml.sax.InputSource;
 
 import com.google.gson.JsonElement;
 
-import analyzer.Evaluators.Evaluator;
 import analyzer.Reporting.WriteToCSV;
 import analyzer.SourceAdaptors.Parser;
 import analyzer.SourceAdaptors.SourceParserFactory;
@@ -91,8 +90,10 @@ public class Splitter {
 			Parser parser = factory.getParser(source, dataReadPath);
 			while (parser.next()) {
 				writetomatch = true;
+//				System.out.println(parser.dataDict);
 				if (eval != null)
 					writetomatch = eval.evaluate(parser.dataDict);
+//				System.out.println(writetomatch);
 				if (!dataOnly)
 					reportWriter.csvloader(parser.dataDict, writetomatch);
 				if (!isReport) {

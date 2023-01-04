@@ -66,11 +66,12 @@ public class ParseSIPCSV extends Parser {
 		boolean nextExists = false;
 		String[] row = null;
 		if ((row = cr.readNext()) != null) {
+//			System.out.println("-------------------------------------------------");
 			nextExists = true;
 			for (int i = 0; i < row.length; i++) {
 				if (row[i].isBlank())
 					continue;
-				//System.out.println(row[i]);
+//				System.out.println(row[i]);
 				String field_name = header[i].strip();
 				HashSet<String> field_value_list = new HashSet<String>();
 				if(multiValueSep.isBlank())
